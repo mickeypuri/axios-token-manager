@@ -1,6 +1,6 @@
-dist
-coverage
+dist/lib
 node_modules/
+coverage
 .env
 .env.test
 logs

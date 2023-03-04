@@ -1,0 +1,25 @@
+"name": "axios-token-manager",
+"version": "0.0.1",
+"description": "A manager for Axios Tokens in a Node API Server or a JS Client",
+"main": "lib/cjs/index.js",
+"module": "lib/esm/index.js",
+"sideEffects": false,
+"repository": {
+    "type": "git",
+    "url": "https://github.com/mickeypuri/axios-token-manager"
+},
+"files": [
+    "lib",
+    "LICENSE",
+    "package.json",
+    "README.md"
+],
+"keywords": [
+    "javascript",
+    "axios",
+    "token",
+    "interceptor",
+    "refresh",
+    "oauth"
+],
+"author": "Mickey Puri",
