@@ -1,0 +1,1 @@
+export { pluck, PluckType } from './array/pluck';
