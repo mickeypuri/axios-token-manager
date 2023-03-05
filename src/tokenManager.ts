@@ -6,6 +6,7 @@ import { noop } from './utils/noop';
 let cachedToken: IToken;
 let options: IConfig;
 let expiration: Number;
+const lock = new Semaphore(1);
 
 const defaultSettings: IDefaultSettings = {
     refreshBuffer: 10,
@@ -24,7 +25,6 @@ const getToken: TokenProvider  = async () => {
 };
 
 const getFreshToken = async () : Promise<IToken> => {
-    const lock = new Semaphore(1);
     await lock.acquire();
 
     // check if a previous request updated the token while this request waited to acquire the lock
