@@ -2,7 +2,7 @@ import { AxiosInstance } from 'axios';
 
 export interface ITokenManager extends IDefaultSettings {
     instance: AxiosInstance,
-    getToken: TokenProvider,
+    getCredentials: TokenProvider,
 }
 
 export interface IDefaultSettings {
@@ -11,6 +11,16 @@ export interface IDefaultSettings {
     formatter?: Formatter,
     onRefresh?: VoidFunction,
     onAuthFail?: VoidFunction,
+}
+
+export interface IConfig {
+    instance: AxiosInstance,
+    getCredentials: TokenProvider,
+    refreshBuffer: number,
+    header: string,
+    formatter: Formatter,
+    onRefresh: VoidFunction,
+    onAuthFail: VoidFunction,
 }
 
 export interface IToken {
