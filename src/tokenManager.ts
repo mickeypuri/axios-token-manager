@@ -19,17 +19,18 @@ const getToken: TokenProvider  = async () => {
     if (isTokenValid()) {
         return Promise.resolve(cachedToken);
     }
-    return new Promise(getFreshToken);
+    const credentials = await getFreshToken();
+    return Promise.resolve(credentials);
 };
 
-const getFreshToken = async (resolve, reject) : Promise<IToken> => {
+const getFreshToken = async () : Promise<IToken> => {
     const lock = new Semaphore(1);
     await lock.acquire();
 
     // check if a previous request updated the token while this request waited to acquire the lock
     if (isTokenValid()) {
         lock.release();
-        return resolve(cachedToken);
+        return Promise.resolve(cachedToken);
     }
 
     const { getCredentials } = options;
@@ -40,10 +41,10 @@ const getFreshToken = async (resolve, reject) : Promise<IToken> => {
         const timeSpan = (expires_in - refreshBuffer) * 1000;
         cachedToken = credentials;
         expiration = Date.now() + timeSpan;
-        return resolve(credentials);
+        return Promise.resolve(credentials);
     } 
     catch (error) {
-        return reject(error);
+        return Promise.reject(error);
     } 
     finally {
         lock.release();
