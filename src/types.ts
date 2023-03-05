@@ -1,11 +1,11 @@
 import { AxiosInstance } from 'axios';
 
-export interface ITokenManager extends IDefaultConfig {
+export interface ITokenManager extends IDefaultSettings {
     instance: AxiosInstance,
     getToken: TokenProvider,
 }
 
-export interface IDefaultConfig {
+export interface IDefaultSettings {
     refreshBuffer?: number,
     header?: string,
     formatter?: Formatter,

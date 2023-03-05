@@ -1,9 +1,9 @@
-import { ITokenManager, IToken, IDefaultConfig } from './types';
+import { ITokenManager, IToken, IDefaultSettings } from './types';
 import { noop } from './utils/noop';
 
 let token: IToken;
 
-const defaultConfig: IDefaultConfig = {
+const defaultSettings: IDefaultSettings = {
     refreshBuffer: 10,
     header: 'Authorization',
     formatter: (access_token) => `Bearer ${access_token}`,
@@ -11,8 +11,10 @@ const defaultConfig: IDefaultConfig = {
     onAuthFail: noop
 };
 
-const tokenManager = (options: ITokenManager) => {
-    const config = {...defaultConfig, ...options };
+const tokenManager = (settings: ITokenManager) => {
+    const options = {...defaultSettings, ...settings };
+
+
 
 
 };
