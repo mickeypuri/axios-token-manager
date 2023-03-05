@@ -1,8 +1,11 @@
 import { AxiosInstance } from 'axios';
 
-export interface ITokenManager {
+export interface ITokenManager extends IDefaultConfig {
     instance: AxiosInstance,
     getToken: TokenProvider,
+}
+
+export interface IDefaultConfig {
     refreshBuffer?: number,
     header?: string,
     formatter?: Formatter,
@@ -19,4 +22,4 @@ export interface IToken {
 
 export type TokenProvider = () => Promise<IToken>;
 
-export type Formatter = (accessToken: string, header: string) => string;
+export type Formatter = (accessToken: string) => string;
