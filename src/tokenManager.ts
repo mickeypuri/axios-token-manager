@@ -14,7 +14,8 @@ const defaultSettings: IDefaultSettings = {
     formatter: (access_token) => `Bearer ${access_token}`,
     onRefresh: noop,
     onAuthFail: noop,
-    onTokenRequestFail: noop
+    onTokenRequestFail: noop,
+    refreshOnStatus: [401]
 };
 
 const getToken: TokenProvider  = async () => {
