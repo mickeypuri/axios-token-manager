@@ -13,7 +13,8 @@ const defaultSettings: IDefaultSettings = {
     header: 'Authorization',
     formatter: (access_token) => `Bearer ${access_token}`,
     onRefresh: noop,
-    onAuthFail: noop
+    onAuthFail: noop,
+    onTokenRequestFail: noop
 };
 
 const getToken: TokenProvider  = async () => {
@@ -37,13 +38,16 @@ const getFreshToken = async () : Promise<IToken> => {
     try {
         const credentials = await getCredentials();
         const {expires_in} = credentials;
-        const {refreshBuffer} = options;
+        const {refreshBuffer, onRefresh} = options;
         const timeSpan = (expires_in - refreshBuffer) * 1000;
         cachedToken = credentials;
         expiration = Date.now() + timeSpan;
+        onRefresh();
         return Promise.resolve(credentials);
     } 
     catch (error) {
+        const { onTokenRequestFail } = options;
+        onTokenRequestFail();
         return Promise.reject(error);
     } 
     finally {

@@ -11,6 +11,7 @@ export interface IDefaultSettings {
     formatter?: Formatter,
     onRefresh?: VoidFunction,
     onAuthFail?: VoidFunction,
+    onTokenRequestFail?: VoidFunction,
 }
 
 export interface IConfig {
@@ -21,6 +22,7 @@ export interface IConfig {
     formatter: Formatter,
     onRefresh: VoidFunction,
     onAuthFail: VoidFunction,
+    onTokenRequestFail: VoidFunction,
 }
 
 export interface IToken {
