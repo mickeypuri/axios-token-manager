@@ -12,7 +12,9 @@ export interface IDefaultSettings {
     onRefresh?: VoidFunction,
     onAuthFail?: VoidFunction,
     onTokenRequestFail?: VoidFunction,
-    refreshOnStatus?: number []
+    refreshOnStatus?: number [],
+    retryThreshold?: number,
+    onRetryThreshold?: (retries: number) => void,
 }
 
 export interface IConfig {
@@ -24,7 +26,9 @@ export interface IConfig {
     onRefresh: VoidFunction,
     onAuthFail: VoidFunction,
     onTokenRequestFail: VoidFunction,
-    refreshOnStatus: number []
+    refreshOnStatus: number [],
+    retryThreshold: number,
+    onRetryThreshold: (retries: number) => void,
 }
 
 export interface IToken {

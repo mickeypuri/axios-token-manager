@@ -7,6 +7,7 @@ let cachedToken: IToken;
 let options: IConfig;
 let expiration: Number;
 const lock = new Semaphore(1);
+let retries = 0;
 
 const defaultSettings: IDefaultSettings = {
     refreshBuffer: 10,
@@ -15,7 +16,9 @@ const defaultSettings: IDefaultSettings = {
     onRefresh: noop,
     onAuthFail: noop,
     onTokenRequestFail: noop,
-    refreshOnStatus: [401]
+    refreshOnStatus: [401],
+    retryThreshold: 10,
+    onRetryThreshold: noop,
 };
 
 const getToken: TokenProvider  = async () => {
@@ -43,12 +46,17 @@ const getFreshToken = async () : Promise<IToken> => {
         const timeSpan = (expires_in - refreshBuffer) * 1000;
         cachedToken = credentials;
         expiration = Date.now() + timeSpan;
+        retries = 0;
         onRefresh();
         return Promise.resolve(credentials);
     } 
     catch (error) {
-        const { onTokenRequestFail } = options;
+        retries++;
+        const { onTokenRequestFail, retryThreshold, onRetryThreshold } = options;
         onTokenRequestFail();
+        if (retries % retryThreshold === 0) {
+            onRetryThreshold(retries);
+        }
         return Promise.reject(error);
     } 
     finally {
@@ -70,6 +78,10 @@ const requestInterceptor = async (config : InternalAxiosRequestConfig) => {
     (config.headers as AxiosHeaders)[header] = formatter(access_token);
     return config;
 };
+
+const responseInterceptor = async () => {
+
+}
 
 const tokenManager = (settings: ITokenManager) => {
     options = {...defaultSettings, ...settings } as IConfig;
