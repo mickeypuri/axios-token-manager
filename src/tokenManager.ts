@@ -1,9 +1,9 @@
-import { AxiosHeaders, InternalAxiosRequestConfig} from 'axios';
+import { AxiosError, AxiosHeaders, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
 import Semaphore from 'semaphore-async-await';
 import { ITokenManager, IToken, IDefaultSettings, TokenProvider, IConfig } from './types';
 import { noop } from './utils/noop';
 
-let cachedToken: IToken;
+let cachedToken: IToken | null;
 let options: IConfig;
 let expiration: Number;
 const lock = new Semaphore(1);
@@ -23,7 +23,7 @@ const defaultSettings: IDefaultSettings = {
 
 const getToken: TokenProvider  = async () => {
     if (isTokenValid()) {
-        return Promise.resolve(cachedToken);
+        return Promise.resolve(cachedToken as IToken);
     }
     const credentials = await getFreshToken();
     return Promise.resolve(credentials);
@@ -35,7 +35,7 @@ const getFreshToken = async () : Promise<IToken> => {
     // check if a previous request updated the token while this request waited to acquire the lock
     if (isTokenValid()) {
         lock.release();
-        return Promise.resolve(cachedToken);
+        return Promise.resolve(cachedToken as IToken);
     }
 
     const { getCredentials } = options;
@@ -79,14 +79,29 @@ const requestInterceptor = async (config : InternalAxiosRequestConfig) => {
     return config;
 };
 
-const responseInterceptor = async () => {
+const isAuthFailure = (error: AxiosError) => {
+    const { response: { status } = {} } = error;
+    const { refreshOnStatus } = options;
+    return refreshOnStatus.includes(status as number);
+};
 
-}
+const successInterceptor = (response: AxiosResponse) => response;
+
+const errorInterceptor = async (error: AxiosError) => {
+    const authFailed = isAuthFailure(error);
+    if (authFailed) {
+        await lock.acquire();
+        
+    } else {
+        return Promise.reject(error);
+    }
+};
 
 const tokenManager = (settings: ITokenManager) => {
     options = {...defaultSettings, ...settings } as IConfig;
     const { instance } = options;
     instance.interceptors.request.use(requestInterceptor);
+    instance.interceptors.response.use(successInterceptor, errorInterceptor);
 };
 
 export default tokenManager;
