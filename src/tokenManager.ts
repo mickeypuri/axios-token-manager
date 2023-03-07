@@ -8,7 +8,6 @@ let options: IConfig;
 const lock = new Semaphore(1);
 let retries = 0;
 
-
 const getToken: TokenProvider  = async () => {
     if (isTokenValid()) {
         const { token } = cache;
@@ -41,7 +40,7 @@ const getFreshToken = async () : Promise<IToken> => {
     try {
         const credentialsPromise = getCredentials();
         if (!credentialsPromise.then) {
-            throw new Error('Axios Token Manager requires getCredentials to return a Promise');
+            throw new Error('axios-token-manager needs the function `getCredentials` to return a Promise');
         }
         const token = await credentialsPromise;
         const {expires_in} = token;
