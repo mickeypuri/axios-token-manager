@@ -97,7 +97,39 @@ const errorInterceptor = async (error: AxiosError) => {
     const authFailed = isAuthFailure(error);
     if (authFailed) {
         await lock.acquire();
-        
+
+        if (isTokenValid()) {
+            lock.release();
+            const { response : { config } = {}} = error;
+            if (config) {
+                const { access_token } = cachedToken as IToken;
+                const { header, formatter, instance } = options;
+                (config.headers as AxiosHeaders)[header] = formatter(access_token);
+                return instance(config);
+            } else {
+                return Promise.reject(error);
+            }
+        } else {
+            try {
+                const credentials = await getFreshToken();
+                const { response : { config } = {}} = error;
+                if (config) {
+                    const { access_token } = cachedToken as IToken;
+                    const { header, formatter, instance } = options;
+                    (config.headers as AxiosHeaders)[header] = formatter(access_token);
+                    return instance(config);
+                } else {
+                    return Promise.reject(error);
+                }
+            } 
+            catch (error) {
+                return Promise.reject(error);
+            } 
+            finally {
+                lock.release();
+            }
+            
+        }
     } else {
         return Promise.reject(error);
     }
