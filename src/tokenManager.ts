@@ -25,19 +25,28 @@ const getToken: TokenProvider  = async () => {
     if (isTokenValid()) {
         return Promise.resolve(cachedToken as IToken);
     }
-    const credentials = await getFreshToken();
-    return Promise.resolve(credentials);
-};
 
-const getFreshToken = async () : Promise<IToken> => {
     await lock.acquire();
 
-    // check if a previous request updated the token while this request waited to acquire the lock
+    // check if previous request updated token while this request waited
     if (isTokenValid()) {
         lock.release();
         return Promise.resolve(cachedToken as IToken);
     }
 
+    try {
+        const credentials = await getFreshToken();
+        return Promise.resolve(credentials);
+    } 
+    catch (error) {
+        return Promise.reject(error);
+    } 
+    finally {
+        lock.release();
+    }
+};
+
+const getFreshToken = async () : Promise<IToken> => {
     const { getCredentials } = options;
     try {
         const credentials = await getCredentials();
@@ -58,9 +67,6 @@ const getFreshToken = async () : Promise<IToken> => {
             onRetryThreshold(retries);
         }
         return Promise.reject(error);
-    } 
-    finally {
-        lock.release();
     }
 };
 
