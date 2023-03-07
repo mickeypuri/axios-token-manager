@@ -7,6 +7,8 @@ let cache: ICache = initCache;
 let options: IConfig;
 const lock = new Semaphore(1);
 let retries = 0;
+let refreshTries = 0;
+let inRefresh = false;
 
 const getToken: TokenProvider  = async () => {
     if (isTokenValid()) {
@@ -86,7 +88,13 @@ const isAuthFailure = (error: AxiosError) => {
     return refreshOnStatus.includes(status as number);
 };
 
-const successInterceptor = (response: AxiosResponse) => response;
+const successInterceptor = (response: AxiosResponse) => {
+    if (inRefresh) {
+        refreshTries = 0;
+        inRefresh = false;
+    }
+    return response;
+};
 
 const errorInterceptor = async (error: AxiosError) => {
     const authFailed = isAuthFailure(error);

@@ -20,6 +20,7 @@ export interface IDefaultSettings {
     refreshOnStatus?: number [],
     retryThreshold?: number,
     onRetryThreshold?: (retries: number) => void,
+    maxRefreshTries?: number,
 }
 
 export interface IConfig {
@@ -34,6 +35,7 @@ export interface IConfig {
     refreshOnStatus: number [],
     retryThreshold: number,
     onRetryThreshold: (retries: number) => void,
+    maxRefreshTries: number,
 }
 
 export interface IToken {

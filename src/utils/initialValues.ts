@@ -16,4 +16,5 @@ export const defaultSettings: IDefaultSettings = {
     refreshOnStatus: [401],
     retryThreshold: 10,
     onRetryThreshold: noop,
+    maxRefreshTries: 5,
 };
