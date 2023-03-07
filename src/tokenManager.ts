@@ -37,35 +37,6 @@ const getToken: TokenProvider  = async () => {
     }
 };
 
-const getFreshToken = async () : Promise<IToken> => {
-    const { getCredentials } = options;
-    try {
-        const credentialsPromise = getCredentials();
-        if (!credentialsPromise.then) {
-            throw new Error('axios-token-manager needs the function `getCredentials` to return a Promise');
-        }
-        const token = await credentialsPromise;
-        const {expires_in} = token;
-        const {refreshBuffer, onRefresh} = options;
-        const timeSpan = (expires_in - refreshBuffer) * 1000;
-        const expiration = Date.now() + timeSpan;
-        cache = { token, expiration };
-
-        retries = 0;
-        onRefresh();
-        return Promise.resolve(token);
-    } 
-    catch (error) {
-        retries++;
-        const { onTokenRequestFail, retryThreshold, onRetryThreshold } = options;
-        onTokenRequestFail();
-        if (retries % retryThreshold === 0) {
-            onRetryThreshold(retries);
-        }
-        return Promise.reject(error);
-    }
-};
-
 const isTokenValid = () => {
     const { token, expiration } = cache;
     if (!token) {
