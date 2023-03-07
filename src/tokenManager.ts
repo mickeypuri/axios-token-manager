@@ -1,25 +1,15 @@
 import { AxiosError, AxiosHeaders, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
 import Semaphore from 'semaphore-async-await';
-import { ITokenManager, IToken, IDefaultSettings, TokenProvider, IConfig } from './types';
-import { noop } from './utils/noop';
+import { ITokenManager, IToken, IDefaultSettings, TokenProvider, IConfig, ICache } from './types';
+import { initCache, defaultSettings } from './utils/initialValues';
 
+let cache: ICache = initCache;
 let cachedToken: IToken | null;
 let options: IConfig;
 let expiration: Number;
 const lock = new Semaphore(1);
 let retries = 0;
 
-const defaultSettings: IDefaultSettings = {
-    refreshBuffer: 10,
-    header: 'Authorization',
-    formatter: (access_token) => `Bearer ${access_token}`,
-    onRefresh: noop,
-    onAuthFail: noop,
-    onTokenRequestFail: noop,
-    refreshOnStatus: [401],
-    retryThreshold: 10,
-    onRetryThreshold: noop,
-};
 
 const getToken: TokenProvider  = async () => {
     if (isTokenValid()) {

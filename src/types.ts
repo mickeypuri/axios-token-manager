@@ -1,5 +1,10 @@
 import { AxiosInstance } from 'axios';
 
+export interface ICache {
+    token: IToken | null,
+    expiration: number
+}
+
 export interface ITokenManager extends IDefaultSettings {
     instance: AxiosInstance,
     getCredentials: TokenProvider,
