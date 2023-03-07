@@ -39,7 +39,11 @@ const getToken: TokenProvider  = async () => {
 const getFreshToken = async () : Promise<IToken> => {
     const { getCredentials } = options;
     try {
-        const credentials = await getCredentials();
+        const credentialsPromise = getCredentials();
+        if (!credentialsPromise.then) {
+            throw new Error('Axios Token Manager requires getCredentials to return a Promise');
+        }
+        const credentials = await credentialsPromise;
         const {expires_in} = credentials;
         const {refreshBuffer, onRefresh} = options;
         const timeSpan = (expires_in - refreshBuffer) * 1000;
