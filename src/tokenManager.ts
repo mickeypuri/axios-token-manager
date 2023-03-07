@@ -4,16 +4,15 @@ import { ITokenManager, IToken, IDefaultSettings, TokenProvider, IConfig, ICache
 import { initCache, defaultSettings } from './utils/initialValues';
 
 let cache: ICache = initCache;
-let cachedToken: IToken | null;
 let options: IConfig;
-let expiration: Number;
 const lock = new Semaphore(1);
 let retries = 0;
 
 
 const getToken: TokenProvider  = async () => {
     if (isTokenValid()) {
-        return Promise.resolve(cachedToken as IToken);
+        const { token } = cache;
+        return Promise.resolve(token as IToken);
     }
 
     await lock.acquire();
@@ -21,7 +20,8 @@ const getToken: TokenProvider  = async () => {
     // check if previous request updated token while this request waited
     if (isTokenValid()) {
         lock.release();
-        return Promise.resolve(cachedToken as IToken);
+        const { token } = cache;
+        return Promise.resolve(token as IToken);
     }
 
     try {
@@ -43,15 +43,16 @@ const getFreshToken = async () : Promise<IToken> => {
         if (!credentialsPromise.then) {
             throw new Error('Axios Token Manager requires getCredentials to return a Promise');
         }
-        const credentials = await credentialsPromise;
-        const {expires_in} = credentials;
+        const token = await credentialsPromise;
+        const {expires_in} = token;
         const {refreshBuffer, onRefresh} = options;
         const timeSpan = (expires_in - refreshBuffer) * 1000;
-        cachedToken = credentials;
-        expiration = Date.now() + timeSpan;
+        const expiration = Date.now() + timeSpan;
+        cache = { token, expiration };
+
         retries = 0;
         onRefresh();
-        return Promise.resolve(credentials);
+        return Promise.resolve(token);
     } 
     catch (error) {
         retries++;
@@ -65,7 +66,8 @@ const getFreshToken = async () : Promise<IToken> => {
 };
 
 const isTokenValid = () => {
-    if (!cachedToken) {
+    const { token, expiration } = cache;
+    if (!token) {
         return false;
     }
     return expiration > Date.now();
@@ -96,7 +98,8 @@ const errorInterceptor = async (error: AxiosError) => {
             lock.release();
             const { response : { config } = {}} = error;
             if (config) {
-                const { access_token } = cachedToken as IToken;
+                const { token } = cache;
+                const { access_token } = token as IToken;
                 const { header, formatter, instance } = options;
                 (config.headers as AxiosHeaders)[header] = formatter(access_token);
                 return instance(config);
@@ -108,7 +111,8 @@ const errorInterceptor = async (error: AxiosError) => {
                 const credentials = await getFreshToken();
                 const { response : { config } = {}} = error;
                 if (config) {
-                    const { access_token } = cachedToken as IToken;
+                    const { token } = cache;
+                    const { access_token } = token as IToken;
                     const { header, formatter, instance } = options;
                     (config.headers as AxiosHeaders)[header] = formatter(access_token);
                     return instance(config);
