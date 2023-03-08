@@ -81,6 +81,8 @@ const errorInterceptor = async (error: AxiosError) => {
                 (config.headers as AxiosHeaders)[header] = formatter(access_token);
                 return instance(config);
             } else {
+                inRefresh = false;
+                refreshTries = 0;
                 return Promise.reject(error);
             }
         } else {
