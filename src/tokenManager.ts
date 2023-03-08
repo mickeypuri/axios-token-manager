@@ -55,10 +55,11 @@ const requestInterceptor = async (config : InternalAxiosRequestConfig) => {
     return config;
 };
 
-const isAuthFailure = (error: AxiosError) => {
+const shouldRefresh = (error: AxiosError) => {
     const { response: { status } = {} } = error;
-    const { refreshOnStatus } = options;
-    return refreshOnStatus.includes(status as number);
+    const { refreshOnStatus, maxRefreshTries } = options;
+    const authFailed = refreshOnStatus.includes(status as number);
+    return authFailed && ( refreshTries < maxRefreshTries );
 };
 
 const successInterceptor = (response: AxiosResponse) => {
@@ -70,8 +71,8 @@ const successInterceptor = (response: AxiosResponse) => {
 };
 
 const errorInterceptor = async (error: AxiosError) => {
-    const authFailed = isAuthFailure(error);
-    if (authFailed) {
+    const needsToRefresh = shouldRefresh(error);
+    if (needsToRefresh) {
         await lock.acquire();
 
         if (isTokenValid(cache)) {
@@ -97,6 +98,8 @@ const errorInterceptor = async (error: AxiosError) => {
                     (config.headers as AxiosHeaders)[header] = formatter(access_token);
                     return instance(config);
                 } else {
+                    inRefresh = false;
+                    refreshTries = 0;
                     return Promise.reject(error);
                 }
             } 
