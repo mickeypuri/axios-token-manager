@@ -73,42 +73,24 @@ const errorInterceptor = async (error: AxiosError) => {
 
         if (isTokenValid(cache)) {
             lock.release();
-            const { response : { config } = {}} = error;
-            if (config) {
-                const { token } = cache;
-                const { access_token } = token as IToken;
-                const { header, formatter, instance } = options;
-                (config.headers as AxiosHeaders)[header] = formatter(access_token);
-                return instance(config);
-            } else {
-                inRefresh = false;
-                refreshTries = 0;
-                return Promise.reject(error);
-            }
         } else {
             try {
                 const credentials = await getFreshToken(options, triesAccess, setCache);
-                const { response : { config } = {}} = error;
-                if (config) {
-                    const { token } = cache;
-                    const { access_token } = token as IToken;
-                    const { header, formatter, instance } = options;
-                    (config.headers as AxiosHeaders)[header] = formatter(access_token);
-                    return instance(config);
-                } else {
-                    inRefresh = false;
-                    refreshTries = 0;
-                    return Promise.reject(error);
-                }
-            } 
+            }
             catch (error) {
                 return Promise.reject(error);
-            } 
+            }
             finally {
                 lock.release();
             }
-            
         }
+        const { response } = error;
+        const { config } = response as AxiosResponse;
+        const { token } = cache;
+        const { access_token } = token as IToken;
+        const { header, formatter, instance } = options;
+        (config.headers as AxiosHeaders)[header] = formatter(access_token);
+        return instance(config);
     } else {
         return Promise.reject(error);
     }
