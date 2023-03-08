@@ -73,16 +73,15 @@ const shouldRefresh = (error: AxiosError) => {
     const { refreshOnStatus, maxRefreshTries } = options;
     const authFailed = refreshOnStatus.includes(status as number);
 
-    if (authFailed && inRefresh && refreshTries >= maxRefreshTries) {
-        inRefresh = false;
-        refreshTries = 0;
-        return false;
-    }
-
-    if (authFailed) {
+    if (authFailed && refreshTries < maxRefreshTries) {
         inRefresh = true;
         refreshTries++;
         return true;
+    }
+
+    if (authFailed && inRefresh && refreshTries >= maxRefreshTries) {
+        inRefresh = false;
+        refreshTries = 0;
     }
 
     return false;
@@ -90,12 +89,9 @@ const shouldRefresh = (error: AxiosError) => {
 
 const errorInterceptor = async (error: AxiosError) => {
     let needsToRefresh = shouldRefresh(error);
-    
 
     if (needsToRefresh) {
         await lock.acquire();
-        inRefresh = true;
-        refreshTries++;
 
         if (isTokenValid(cache)) {
             lock.release();
