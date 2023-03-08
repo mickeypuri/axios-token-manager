@@ -45,12 +45,12 @@ export interface IToken {
     scope: string
 }
 
-export interface ITries {
+export interface ITriesAccess {
     setTries: SetTries,
     getTries: GetTries
 }
 
-export type SetTries = (retries: number) => void;
+export type SetTries = (tries: number) => void;
 export type GetTries = () => number;
 
 export type SetCache = (cache: ICache) => void;

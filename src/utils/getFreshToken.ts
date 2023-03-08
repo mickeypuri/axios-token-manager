@@ -1,8 +1,8 @@
-import { IToken, IConfig, SetTries, SetCache, ITries } from '../types';
+import { IToken, IConfig, SetCache, ITriesAccess } from '../types';
 
-export const getFreshToken = async (options: IConfig, tries: ITries, setCache: SetCache) : Promise<IToken> => {
+export const getFreshToken = async (options: IConfig, triesAccess: ITriesAccess, setCache: SetCache) : Promise<IToken> => {
     const { getCredentials } = options;
-    const { getTries, setTries } = tries;
+    const { getTries, setTries } = triesAccess;
     try {
         const credentialsPromise = getCredentials();
         if (!credentialsPromise.then) {

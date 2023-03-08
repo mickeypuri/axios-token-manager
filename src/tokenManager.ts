@@ -1,7 +1,8 @@
 import { AxiosError, AxiosHeaders, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
 import Semaphore from 'semaphore-async-await';
-import { ITokenManager, IToken, IDefaultSettings, TokenProvider, IConfig, ICache } from './types';
+import { ITokenManager, IToken, TokenProvider, IConfig, ICache, ITriesAccess, SetTries, GetTries, SetCache } from './types';
 import { initCache, defaultSettings } from './utils/initialValues';
+import { getFreshToken } from './utils/getFreshToken';
 
 let cache: ICache = initCache;
 let options: IConfig;
@@ -9,6 +10,14 @@ const lock = new Semaphore(1);
 let retries = 0;
 let refreshTries = 0;
 let inRefresh = false;
+
+const setTries: SetTries = (tries: number) => refreshTries = tries;
+const getTries: GetTries = () => retries;
+const triesAccess: ITriesAccess = {
+    setTries,
+    getTries
+};
+const setCache: SetCache = (value: ICache) => cache = value;
 
 const getToken: TokenProvider  = async () => {
     if (isTokenValid()) {
@@ -26,7 +35,7 @@ const getToken: TokenProvider  = async () => {
     }
 
     try {
-        const credentials = await getFreshToken();
+        const credentials = await getFreshToken(options, triesAccess, setCache);
         return Promise.resolve(credentials);
     } 
     catch (error) {
@@ -86,7 +95,7 @@ const errorInterceptor = async (error: AxiosError) => {
             }
         } else {
             try {
-                const credentials = await getFreshToken();
+                const credentials = await getFreshToken(options, triesAccess, setCache);
                 const { response : { config } = {}} = error;
                 if (config) {
                     const { token } = cache;
