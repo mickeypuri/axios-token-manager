@@ -4,7 +4,6 @@ import { ITokenManager, IToken, TokenProvider, IConfig, ICache, ITriesAccess, Se
 import { initCache, defaultSettings } from './utils/initialValues';
 import { getFreshToken } from './utils/getFreshToken';
 import { isTokenValid } from './utils/isTokenValid';
-import { shouldRefresh } from './utils/shouldRefresh';
 
 let cache: ICache = initCache;
 let options: IConfig;
