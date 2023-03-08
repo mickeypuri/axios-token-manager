@@ -68,6 +68,8 @@ const errorInterceptor = async (error: AxiosError) => {
     const needsToRefresh = shouldRefresh(error, options, refreshTries);
     if (needsToRefresh) {
         await lock.acquire();
+        inRefresh = true;
+        refreshTries++;
 
         if (isTokenValid(cache)) {
             lock.release();
