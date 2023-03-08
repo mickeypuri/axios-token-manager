@@ -3,6 +3,7 @@ import Semaphore from 'semaphore-async-await';
 import { ITokenManager, IToken, TokenProvider, IConfig, ICache, ITriesAccess, SetTries, GetTries, SetCache } from './types';
 import { initCache, defaultSettings } from './utils/initialValues';
 import { getFreshToken } from './utils/getFreshToken';
+import { isTokenValid } from './utils/isTokenValid';
 
 let cache: ICache = initCache;
 let options: IConfig;
@@ -20,7 +21,7 @@ const triesAccess: ITriesAccess = {
 const setCache: SetCache = (value: ICache) => cache = value;
 
 const getToken: TokenProvider  = async () => {
-    if (isTokenValid()) {
+    if (isTokenValid(cache)) {
         const { token } = cache;
         return Promise.resolve(token as IToken);
     }
@@ -28,7 +29,7 @@ const getToken: TokenProvider  = async () => {
     await lock.acquire();
 
     // check if previous request updated token while this request waited
-    if (isTokenValid()) {
+    if (isTokenValid(cache)) {
         lock.release();
         const { token } = cache;
         return Promise.resolve(token as IToken);
@@ -44,14 +45,6 @@ const getToken: TokenProvider  = async () => {
     finally {
         lock.release();
     }
-};
-
-const isTokenValid = () => {
-    const { token, expiration } = cache;
-    if (!token) {
-        return false;
-    }
-    return expiration > Date.now();
 };
 
 const requestInterceptor = async (config : InternalAxiosRequestConfig) => {
@@ -81,7 +74,7 @@ const errorInterceptor = async (error: AxiosError) => {
     if (authFailed) {
         await lock.acquire();
 
-        if (isTokenValid()) {
+        if (isTokenValid(cache)) {
             lock.release();
             const { response : { config } = {}} = error;
             if (config) {
