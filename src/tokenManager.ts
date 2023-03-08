@@ -4,6 +4,7 @@ import { ITokenManager, IToken, TokenProvider, IConfig, ICache, ITriesAccess, Se
 import { initCache, defaultSettings } from './utils/initialValues';
 import { getFreshToken } from './utils/getFreshToken';
 import { isTokenValid } from './utils/isTokenValid';
+import { shouldRefresh } from './utils/shouldRefresh';
 
 let cache: ICache = initCache;
 let options: IConfig;
@@ -55,13 +56,6 @@ const requestInterceptor = async (config : InternalAxiosRequestConfig) => {
     return config;
 };
 
-const shouldRefresh = (error: AxiosError) => {
-    const { response: { status } = {} } = error;
-    const { refreshOnStatus, maxRefreshTries } = options;
-    const authFailed = refreshOnStatus.includes(status as number);
-    return authFailed && ( refreshTries < maxRefreshTries );
-};
-
 const successInterceptor = (response: AxiosResponse) => {
     if (inRefresh) {
         refreshTries = 0;
@@ -71,7 +65,7 @@ const successInterceptor = (response: AxiosResponse) => {
 };
 
 const errorInterceptor = async (error: AxiosError) => {
-    const needsToRefresh = shouldRefresh(error);
+    const needsToRefresh = shouldRefresh(error, options, refreshTries);
     if (needsToRefresh) {
         await lock.acquire();
 
