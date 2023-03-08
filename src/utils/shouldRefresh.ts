@@ -2,10 +2,11 @@ import { AxiosError } from 'axios';
 import { IConfig } from '../types';
 
 export const shouldRefresh = (error: AxiosError, options: IConfig, refreshTries: number) => {
-    if (!error.response) {
+    const { response } = error;
+    if (!response) {
         return false;
     }
-    const { response: { status } = {} } = error;
+    const { status } = response;
     const { refreshOnStatus, maxRefreshTries } = options;
     const authFailed = refreshOnStatus.includes(status as number);
     return authFailed && ( refreshTries < maxRefreshTries );
