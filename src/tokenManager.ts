@@ -4,7 +4,7 @@ import { ITokenManager, IToken, TokenProvider, IConfig, ICache, ITriesAccess, Se
 import { initCache, defaultSettings } from './utils/initialValues';
 import { getFreshToken } from './utils/getFreshToken';
 import { isTokenValid } from './utils/isTokenValid';
-import { updateState, getState } from './state';
+import { updateState, getState, setInitialState } from './state';
 
 let cache: ICache = initCache;
 let options: IConfig;
@@ -126,7 +126,7 @@ const tokenManager = (settings: ITokenManager) => {
     _instance = instance;
     _getCredentials = getCredentials;
     options = {...defaultSettings, ...rest };
-    updateState({ options });
+    setInitialState(options);
     instance.interceptors.request.use(requestInterceptor);
     instance.interceptors.response.use(successInterceptor, errorInterceptor);
 };

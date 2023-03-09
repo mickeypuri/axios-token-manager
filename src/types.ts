@@ -53,7 +53,7 @@ export interface IState {
     options: IConfig,
     tokenTries: number,
     recoveryTries: number,
-    inRefresh: boolean
+    inRecovery: boolean
 }
 
 export type SetTries = (tries: number) => void;
