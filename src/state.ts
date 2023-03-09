@@ -1,13 +1,8 @@
-import { IState } from './types';
-import { defaultSettings, initCache } from './utils/initialValues';
+import { IState, IConfig } from './types';
+import { initCache } from './utils/initialValues';
 
-let state: IState = {
-    cache: initCache,
-    options: defaultSettings,
-    retries: 0,
-    refreshTries: 0,
-    inRefresh: false
-};
+let state: IState;
+
 
 export const updateState = (update: Partial<IState>) => {
     state = { ...state, ...update };

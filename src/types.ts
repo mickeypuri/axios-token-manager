@@ -51,8 +51,8 @@ export interface ITriesAccess {
 export interface IState {
     cache: ICache,
     options: IConfig,
-    retries: number,
-    refreshTries: number,
+    tokenTries: number,
+    recoveryTries: number,
     inRefresh: boolean
 }
 
