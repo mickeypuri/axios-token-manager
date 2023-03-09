@@ -5,11 +5,7 @@ export const getFreshToken = async (getCredentials :TokenProvider) : Promise<ITo
     const {options} = getState();
 
     try {
-        const credentialsPromise = getCredentials();
-        if (!credentialsPromise.then) {
-            throw new Error('axios-token-manager needs the function `getCredentials` to return a Promise');
-        }
-        const token = await credentialsPromise;
+        const token = await getCredentials();
         const {expires_in} = token;
         const {refreshBuffer, onRefresh} = options;
         const timeSpan = (expires_in - refreshBuffer) * 1000;
