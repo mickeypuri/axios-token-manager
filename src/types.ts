@@ -24,8 +24,6 @@ export interface IDefaultSettings {
 }
 
 export interface IConfig {
-    instance: AxiosInstance,
-    getCredentials: TokenProvider,
     refreshBuffer: number,
     header: string,
     formatter: Formatter,
@@ -48,6 +46,14 @@ export interface IToken {
 export interface ITriesAccess {
     setTries: SetTries,
     getTries: GetTries
+}
+
+export interface IState {
+    cache: ICache,
+    options: IConfig,
+    retries: number,
+    refreshTries: number,
+    inRefresh: boolean
 }
 
 export type SetTries = (tries: number) => void;
