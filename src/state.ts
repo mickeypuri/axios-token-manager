@@ -13,7 +13,6 @@ export const setInitialState = (options: IConfig) => {
     }
 };
 
-
 export const updateState = (update: Partial<IState>) => {
     state = { ...state, ...update };
 };

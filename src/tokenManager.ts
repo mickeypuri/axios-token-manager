@@ -9,15 +9,15 @@ import { updateState, getState, setInitialState } from './state';
 let cache: ICache = initCache;
 let options: IConfig;
 const lock = new Semaphore(1);
-const retries = 0;
-let refreshTries = 0;
-let inRefresh = false;
+const tokenTries = 0;
+let recoveryTries = 0;
+let inRecovery = false;
 
 let _instance: AxiosInstance;
 let _getCredentials: TokenProvider;
 
-const setTries: SetTries = (tries: number) => refreshTries = tries;
-const getTries: GetTries = () => retries;
+const setTries: SetTries = (tries: number) => recoveryTries = tries;
+const getTries: GetTries = () => tokenTries;
 const triesAccess: ITriesAccess = {
     setTries,
     getTries
@@ -60,9 +60,9 @@ const requestInterceptor = async (config : InternalAxiosRequestConfig) => {
 };
 
 const successInterceptor = (response: AxiosResponse) => {
-    if (inRefresh) {
-        refreshTries = 0;
-        inRefresh = false;
+    if (inRecovery) {
+        recoveryTries = 0;
+        inRecovery = false;
     }
     return response;
 };
@@ -76,15 +76,15 @@ const shouldRefresh = (error: AxiosError) => {
     const { refreshOnStatus, maxRefreshTries } = options;
     const authFailed = refreshOnStatus.includes(status as number);
 
-    if (authFailed && refreshTries < maxRefreshTries) {
-        inRefresh = true;
-        refreshTries++;
+    if (authFailed && recoveryTries < maxRefreshTries) {
+        inRecovery = true;
+        recoveryTries++;
         return true;
     }
 
-    if (authFailed && inRefresh && refreshTries >= maxRefreshTries) {
-        inRefresh = false;
-        refreshTries = 0;
+    if (authFailed && inRecovery && recoveryTries >= maxRefreshTries) {
+        inRecovery = false;
+        recoveryTries = 0;
     }
 
     return false;
