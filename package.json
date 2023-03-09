@@ -5,9 +5,13 @@
   "author": "Mickey Puri",
   "license": "MIT",
   "scripts": {
-    "compile": "rimraf dist/lib && tsc && tsc --build tsconfig.es5.json"
+    "compile": "rimraf dist/lib && tsc && tsc --build tsconfig.es5.json",
+    "eslint": "eslint src/index.ts"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
+    "eslint": "^8.35.0",
     "rimraf": "^4.3.0",
     "typescript": "^4.9.5"
   },
