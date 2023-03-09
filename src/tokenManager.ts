@@ -9,7 +9,7 @@ import { updateState, getState } from './state';
 let cache: ICache = initCache;
 let options: IConfig;
 const lock = new Semaphore(1);
-let retries = 0;
+const retries = 0;
 let refreshTries = 0;
 let inRefresh = false;
 
@@ -91,7 +91,7 @@ const shouldRefresh = (error: AxiosError) => {
 };
 
 const errorInterceptor = async (error: AxiosError) => {
-    let needsToRefresh = shouldRefresh(error);
+    const needsToRefresh = shouldRefresh(error);
 
     if (needsToRefresh) {
         await lock.acquire();
@@ -100,7 +100,7 @@ const errorInterceptor = async (error: AxiosError) => {
             lock.release();
         } else {
             try {
-                const credentials = await getFreshToken(_getCredentials, options, triesAccess, setCache);
+                await getFreshToken(_getCredentials, options, triesAccess, setCache);
             }
             catch (error) {
                 return Promise.reject(error);
