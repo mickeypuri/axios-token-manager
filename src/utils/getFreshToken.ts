@@ -1,7 +1,9 @@
-import { IToken, IConfig, SetCache, ITriesAccess, TokenProvider } from '../types';
+import { IToken, TokenProvider } from '../types';
+import { getState, updateState } from '../state';
 
-export const getFreshToken = async (getCredentials :TokenProvider, options: IConfig, triesAccess: ITriesAccess, setCache: SetCache) : Promise<IToken> => {
-    const { getTries, setTries } = triesAccess;
+export const getFreshToken = async (getCredentials :TokenProvider) : Promise<IToken> => {
+    const {options} = getState();
+
     try {
         const credentialsPromise = getCredentials();
         if (!credentialsPromise.then) {
@@ -12,18 +14,22 @@ export const getFreshToken = async (getCredentials :TokenProvider, options: ICon
         const {refreshBuffer, onRefresh} = options;
         const timeSpan = (expires_in - refreshBuffer) * 1000;
         const expiration = Date.now() + timeSpan;
-        setCache({ token, expiration });
-        setTries(0);
+
+        updateState({ 
+            cache: { token, expiration },
+            tokenTries: 0
+        });
+
         onRefresh();
         return Promise.resolve(token);
     } 
     catch (error) {
-        const retries = getTries();
-        setTries(retries + 1);
+        const { tokenTries } = getState();
+        updateState({ tokenTries: tokenTries + 1 });
         const { onTokenRequestFail, retryThreshold, onRetryThreshold } = options;
         onTokenRequestFail();
-        if (retries % retryThreshold === 0) {
-            onRetryThreshold(retries);
+        if (tokenTries % retryThreshold === 0) {
+            onRetryThreshold(tokenTries);
         }
         return Promise.reject(error);
     }

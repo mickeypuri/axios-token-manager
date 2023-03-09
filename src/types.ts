@@ -43,11 +43,6 @@ export interface IToken {
     scope: string
 }
 
-export interface ITriesAccess {
-    setTries: SetTries,
-    getTries: GetTries
-}
-
 export interface IState {
     cache: ICache,
     options: IConfig,
@@ -55,11 +50,6 @@ export interface IState {
     recoveryTries: number,
     inRecovery: boolean
 }
-
-export type SetTries = (tries: number) => void;
-export type GetTries = () => number;
-
-export type SetCache = (cache: ICache) => void;
 
 export type TokenProvider = () => Promise<IToken>;
 
