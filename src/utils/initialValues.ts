@@ -1,4 +1,4 @@
-import { ICache, IDefaultSettings } from '../types';
+import { ICache, IConfig } from '../types';
 import { noop } from './noop';
 
 export const initCache: ICache = {
@@ -6,7 +6,7 @@ export const initCache: ICache = {
     expiration: 0
 };
 
-export const defaultSettings: IDefaultSettings = {
+export const defaultSettings: IConfig = {
     refreshBuffer: 10,
     header: 'Authorization',
     formatter: (access_token) => `Bearer ${access_token}`,
