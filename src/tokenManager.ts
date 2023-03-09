@@ -1,30 +1,17 @@
 import { AxiosError, AxiosHeaders, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
 import Semaphore from 'semaphore-async-await';
-import { ITokenManager, IToken, TokenProvider, IConfig, ICache, ITriesAccess, SetTries, GetTries, SetCache } from './types';
-import { initCache, defaultSettings } from './utils/initialValues';
+import { ITokenManager, IToken, TokenProvider } from './types';
+import { defaultSettings } from './utils/initialValues';
 import { getFreshToken } from './utils/getFreshToken';
 import { isTokenValid } from './utils/isTokenValid';
 import { updateState, getState, setInitialState } from './state';
 
-let cache: ICache = initCache;
-let options: IConfig;
 const lock = new Semaphore(1);
-const tokenTries = 0;
-let recoveryTries = 0;
-let inRecovery = false;
-
 let _instance: AxiosInstance;
 let _getCredentials: TokenProvider;
 
-const setTries: SetTries = (tries: number) => recoveryTries = tries;
-const getTries: GetTries = () => tokenTries;
-const triesAccess: ITriesAccess = {
-    setTries,
-    getTries
-};
-const setCache: SetCache = (value: ICache) => cache = value;
-
 const getToken: TokenProvider  = async () => {
+    const { cache } = getState();
     if (isTokenValid(cache)) {
         const { token } = cache;
         return Promise.resolve(token as IToken);
@@ -40,7 +27,7 @@ const getToken: TokenProvider  = async () => {
     }
 
     try {
-        const credentials = await getFreshToken(_getCredentials, options, triesAccess, setCache);
+        const credentials = await getFreshToken(_getCredentials);
         return Promise.resolve(credentials);
     } 
     catch (error) {
@@ -52,6 +39,7 @@ const getToken: TokenProvider  = async () => {
 };
 
 const requestInterceptor = async (config : InternalAxiosRequestConfig) => {
+    const { options } = getState();
     const token = await getToken();
     const { access_token } = token;
     const { header, formatter } = options;
@@ -60,14 +48,18 @@ const requestInterceptor = async (config : InternalAxiosRequestConfig) => {
 };
 
 const successInterceptor = (response: AxiosResponse) => {
+    const { inRecovery } = getState();
     if (inRecovery) {
-        recoveryTries = 0;
-        inRecovery = false;
+        updateState({
+            recoveryTries: 0,
+            inRecovery: false
+        });
     }
     return response;
 };
 
 const shouldRefresh = (error: AxiosError) => {
+    const { options, recoveryTries, inRecovery } = getState();
     const { response } = error;
     if (!response) {
         return false;
@@ -77,14 +69,18 @@ const shouldRefresh = (error: AxiosError) => {
     const authFailed = refreshOnStatus.includes(status as number);
 
     if (authFailed && recoveryTries < maxRefreshTries) {
-        inRecovery = true;
-        recoveryTries++;
+        updateState({
+            inRecovery: true,
+            recoveryTries: recoveryTries + 1
+        });
         return true;
     }
 
     if (authFailed && inRecovery && recoveryTries >= maxRefreshTries) {
-        inRecovery = false;
-        recoveryTries = 0;
+        updateState({
+            inRecovery: false,
+            recoveryTries: 0
+        });
     }
 
     return false;
@@ -95,12 +91,13 @@ const errorInterceptor = async (error: AxiosError) => {
 
     if (needsToRefresh) {
         await lock.acquire();
+        const { cache } = getState();
 
         if (isTokenValid(cache)) {
             lock.release();
         } else {
             try {
-                await getFreshToken(_getCredentials, options, triesAccess, setCache);
+                await getFreshToken(_getCredentials);
             }
             catch (error) {
                 return Promise.reject(error);
@@ -109,6 +106,7 @@ const errorInterceptor = async (error: AxiosError) => {
                 lock.release();
             }
         }
+        const { options } = getState();
         const { response } = error;
         const { config } = response as AxiosResponse;
         const { token } = cache;
@@ -125,7 +123,7 @@ const tokenManager = (settings: ITokenManager) => {
     const { instance, getCredentials, ...rest} = settings;
     _instance = instance;
     _getCredentials = getCredentials;
-    options = {...defaultSettings, ...rest };
+    const options = {...defaultSettings, ...rest };
     setInitialState(options);
     instance.interceptors.request.use(requestInterceptor);
     instance.interceptors.response.use(successInterceptor, errorInterceptor);
