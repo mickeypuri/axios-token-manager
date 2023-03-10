@@ -7,7 +7,7 @@ export const getFreshToken = async (getCredentials :TokenProvider) : Promise<ITo
     try {
         const token = await getCredentials();
         const {expires_in} = token;
-        const {refreshBuffer, onRefresh} = options;
+        const {refreshBuffer, onTokenRefresh} = options;
         const timeSpan = (expires_in - refreshBuffer) * 1000;
         const expiration = Date.now() + timeSpan;
 
@@ -16,7 +16,7 @@ export const getFreshToken = async (getCredentials :TokenProvider) : Promise<ITo
             tokenTries: 0
         });
 
-        onRefresh();
+        onTokenRefresh();
         return Promise.resolve(token);
     } 
     catch (error) {

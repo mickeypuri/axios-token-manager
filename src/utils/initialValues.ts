@@ -10,7 +10,7 @@ export const defaultSettings: IConfig = {
     refreshBuffer: 10,
     header: 'Authorization',
     formatter: (access_token) => `Bearer ${access_token}`,
-    onRefresh: noop,
+    onTokenRefresh: noop,
     onAuthFail: noop,
     onTokenRequestFail: noop,
     refreshOnStatus: [401],
