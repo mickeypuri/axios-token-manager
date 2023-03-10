@@ -64,7 +64,7 @@ const errorInterceptor = async (error: AxiosError) => {
     }
 };
 
-const tokenManager = (settings: ITokenManager) => {
+export const tokenManager = (settings: ITokenManager) => {
     const { instance, getCredentials, ...rest} = settings;
     _instance = instance;
     const options = {...defaultSettings, ...rest };
@@ -72,5 +72,3 @@ const tokenManager = (settings: ITokenManager) => {
     instance.interceptors.request.use(requestInterceptor);
     instance.interceptors.response.use(successInterceptor, errorInterceptor);
 };
-
-export default tokenManager;
