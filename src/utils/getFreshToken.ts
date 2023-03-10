@@ -22,10 +22,10 @@ export const getFreshToken = async (getCredentials :TokenProvider) : Promise<ITo
     catch (error) {
         const { tokenTries } = getState();
         updateState({ tokenTries: tokenTries + 1 });
-        const { onTokenRequestFail, tokenTryThreshold, onRetryThreshold } = options;
+        const { onTokenRequestFail, tokenTryThreshold, onTokenTryThreshold } = options;
         onTokenRequestFail();
         if (tokenTries % tokenTryThreshold === 0) {
-            onRetryThreshold(tokenTries);
+            onTokenTryThreshold(tokenTries);
         }
         return Promise.reject(error);
     }
