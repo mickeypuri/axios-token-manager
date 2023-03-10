@@ -59,28 +59,31 @@ const successInterceptor = (response: AxiosResponse) => {
 };
 
 const shouldRecover = (error: AxiosError) => {
-    const { options, recoveryTries, inRecovery } = getState();
+    const { options, recoveryTries } = getState();
     const { response } = error;
     if (!response) {
         return false;
     }
     const { status } = response;
-    const { refreshOnStatus, maxRecoveryTries } = options;
+    const { refreshOnStatus, maxRecoveryTries, onAuthFail } = options;
     const authFailed = refreshOnStatus.includes(status as number);
 
-    if (authFailed && recoveryTries < maxRecoveryTries) {
-        updateState({
-            inRecovery: true,
-            recoveryTries: recoveryTries + 1
-        });
-        return true;
-    }
+    if (authFailed) {
+        onAuthFail();
 
-    if (authFailed && inRecovery && recoveryTries >= maxRecoveryTries) {
-        updateState({
-            inRecovery: false,
-            recoveryTries: 0
-        });
+        if (recoveryTries < maxRecoveryTries) {
+            updateState({
+                inRecovery: true,
+                recoveryTries: recoveryTries + 1
+            });
+            return true;
+        } 
+        else {
+            updateState({
+                inRecovery: false,
+                recoveryTries: 0
+            });
+        }
     }
 
     return false;
