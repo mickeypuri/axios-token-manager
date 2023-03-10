@@ -50,7 +50,8 @@ export interface IState {
     options: IConfig,
     tokenTries: number,
     recoveryTries: number,
-    inRecovery: boolean
+    inRecovery: boolean,
+    getCredentials: TokenProvider,
 }
 
 export type TokenProvider = () => Promise<IToken>;

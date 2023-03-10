@@ -9,10 +9,9 @@ import { updateState, getState, setInitialState } from './state';
 
 const lock = new Semaphore(1);
 let _instance: AxiosInstance;
-let _getCredentials: TokenProvider;
 
 const getToken: TokenProvider  = async () => {
-    const { cache } = getState();
+    const { cache, getCredentials } = getState();
     if (isTokenValid(cache)) {
         const { token } = cache;
         return Promise.resolve(token as IToken);
@@ -28,7 +27,7 @@ const getToken: TokenProvider  = async () => {
     }
 
     try {
-        const credentials = await getFreshToken(_getCredentials);
+        const credentials = await getFreshToken(getCredentials);
         return Promise.resolve(credentials);
     } 
     catch (error) {
@@ -64,13 +63,13 @@ const errorInterceptor = async (error: AxiosError) => {
 
     if (needsToRecover) {
         await lock.acquire();
-        const { cache } = getState();
+        const { cache, getCredentials } = getState();
 
         if (isTokenValid(cache)) {
             lock.release();
         } else {
             try {
-                await getFreshToken(_getCredentials);
+                await getFreshToken(getCredentials);
             }
             catch (error) {
                 return Promise.reject(error);
@@ -95,9 +94,8 @@ const errorInterceptor = async (error: AxiosError) => {
 const tokenManager = (settings: ITokenManager) => {
     const { instance, getCredentials, ...rest} = settings;
     _instance = instance;
-    _getCredentials = getCredentials;
     const options = {...defaultSettings, ...rest };
-    setInitialState(options);
+    setInitialState(options, getCredentials);
     instance.interceptors.request.use(requestInterceptor);
     instance.interceptors.response.use(successInterceptor, errorInterceptor);
 };
