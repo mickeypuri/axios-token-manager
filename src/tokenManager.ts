@@ -1,46 +1,19 @@
 import { AxiosError, AxiosHeaders, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
 import Semaphore from 'semaphore-async-await';
-import { ITokenManager, IToken, TokenProvider } from './types';
+import { ITokenManager, IToken } from './types';
 import { defaultSettings } from './utils/initialValues';
 import { getFreshToken } from './utils/getFreshToken';
 import { isTokenValid } from './utils/isTokenValid';
 import { shouldRecover } from './utils/shouldRecover';
+import { getToken } from './utils/getToken';
 import { updateState, getState, setInitialState } from './state';
 
 const lock = new Semaphore(1);
 let _instance: AxiosInstance;
 
-const getToken: TokenProvider  = async () => {
-    const { cache, getCredentials } = getState();
-    if (isTokenValid(cache)) {
-        const { token } = cache;
-        return Promise.resolve(token as IToken);
-    }
-
-    await lock.acquire();
-
-    // check if previous request updated token while this request waited
-    if (isTokenValid(cache)) {
-        lock.release();
-        const { token } = cache;
-        return Promise.resolve(token as IToken);
-    }
-
-    try {
-        const credentials = await getFreshToken(getCredentials);
-        return Promise.resolve(credentials);
-    } 
-    catch (error) {
-        return Promise.reject(error);
-    } 
-    finally {
-        lock.release();
-    }
-};
-
 const requestInterceptor = async (config : InternalAxiosRequestConfig) => {
     const { options } = getState();
-    const token = await getToken();
+    const token = await getToken(lock);
     const { access_token } = token;
     const { header, formatter } = options;
     (config.headers as AxiosHeaders)[header] = formatter(access_token);
