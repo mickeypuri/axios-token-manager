@@ -4,6 +4,7 @@ import { ITokenManager, IToken, TokenProvider } from './types';
 import { defaultSettings } from './utils/initialValues';
 import { getFreshToken } from './utils/getFreshToken';
 import { isTokenValid } from './utils/isTokenValid';
+import { shouldRecover } from './utils/shouldRecover';
 import { updateState, getState, setInitialState } from './state';
 
 const lock = new Semaphore(1);
@@ -56,38 +57,6 @@ const successInterceptor = (response: AxiosResponse) => {
         });
     }
     return response;
-};
-
-const shouldRecover = (error: AxiosError) => {
-    const { options, recoveryTries } = getState();
-    const { response } = error;
-    if (!response) {
-        return false;
-    }
-    const { status } = response;
-    const { refreshOnStatus, maxRecoveryTries, onAuthFail, onRecoveryAbort } = options;
-    const authFailed = refreshOnStatus.includes(status as number);
-
-    if (authFailed) {
-        onAuthFail();
-
-        if (recoveryTries < maxRecoveryTries) {
-            updateState({
-                inRecovery: true,
-                recoveryTries: recoveryTries + 1
-            });
-            return true;
-        } 
-        else {
-            onRecoveryAbort();
-            updateState({
-                inRecovery: false,
-                recoveryTries: 0
-            });
-        }
-    }
-
-    return false;
 };
 
 const errorInterceptor = async (error: AxiosError) => {
