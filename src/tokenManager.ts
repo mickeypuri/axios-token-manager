@@ -65,10 +65,10 @@ const shouldRecover = (error: AxiosError) => {
         return false;
     }
     const { status } = response;
-    const { refreshOnStatus, maxRefreshTries } = options;
+    const { refreshOnStatus, maxRecoveryTries } = options;
     const authFailed = refreshOnStatus.includes(status as number);
 
-    if (authFailed && recoveryTries < maxRefreshTries) {
+    if (authFailed && recoveryTries < maxRecoveryTries) {
         updateState({
             inRecovery: true,
             recoveryTries: recoveryTries + 1
@@ -76,7 +76,7 @@ const shouldRecover = (error: AxiosError) => {
         return true;
     }
 
-    if (authFailed && inRecovery && recoveryTries >= maxRefreshTries) {
+    if (authFailed && inRecovery && recoveryTries >= maxRecoveryTries) {
         updateState({
             inRecovery: false,
             recoveryTries: 0

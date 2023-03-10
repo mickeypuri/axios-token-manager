@@ -16,5 +16,5 @@ export const defaultSettings: IConfig = {
     refreshOnStatus: [401],
     retryThreshold: 10,
     onRetryThreshold: noop,
-    maxRefreshTries: 5,
+    maxRecoveryTries: 5,
 };
