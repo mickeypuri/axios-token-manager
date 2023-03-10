@@ -58,7 +58,7 @@ const successInterceptor = (response: AxiosResponse) => {
     return response;
 };
 
-const shouldRefresh = (error: AxiosError) => {
+const shouldRecover = (error: AxiosError) => {
     const { options, recoveryTries, inRecovery } = getState();
     const { response } = error;
     if (!response) {
@@ -87,9 +87,9 @@ const shouldRefresh = (error: AxiosError) => {
 };
 
 const errorInterceptor = async (error: AxiosError) => {
-    const needsToRefresh = shouldRefresh(error);
+    const needsToRecover = shouldRecover(error);
 
-    if (needsToRefresh) {
+    if (needsToRecover) {
         await lock.acquire();
         const { cache } = getState();
 
