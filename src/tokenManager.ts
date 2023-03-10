@@ -65,7 +65,7 @@ const shouldRecover = (error: AxiosError) => {
         return false;
     }
     const { status } = response;
-    const { refreshOnStatus, maxRecoveryTries, onAuthFail } = options;
+    const { refreshOnStatus, maxRecoveryTries, onAuthFail, onRecoveryAbort } = options;
     const authFailed = refreshOnStatus.includes(status as number);
 
     if (authFailed) {
@@ -79,6 +79,7 @@ const shouldRecover = (error: AxiosError) => {
             return true;
         } 
         else {
+            onRecoveryAbort();
             updateState({
                 inRecovery: false,
                 recoveryTries: 0
