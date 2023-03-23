@@ -18,5 +18,6 @@ export const defaultSettings: IConfig = {
     onTokenTryThreshold: noop,
     onRecoveryTry: noop,
     maxRecoveryTries: 5,
-    onRecoveryAbort: noop
+    onRecoveryAbort: noop,
+    addTokenToLogs: false
 };

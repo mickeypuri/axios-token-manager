@@ -5,39 +5,29 @@ export interface ICache {
     expiration: number
 }
 
-export interface ITokenManager extends IDefaultSettings {
+export interface ITokenManager extends DefaultSettings {
     instance: AxiosInstance,
     getCredentials: TokenProvider,
 }
 
-export interface IDefaultSettings {
-    refreshBuffer?: number,
-    header?: string,
-    formatter?: Formatter,
-    onTokenRefresh?: VoidFunction,
-    onAuthFail?: VoidFunction,
-    onTokenRequestFail?: VoidFunction,
-    refreshOnStatus?: number [],
-    tokenTryThreshold?: number,
-    onTokenTryThreshold?: (retries: number) => void,
-    onRecoveryTry: VoidFunction,
-    maxRecoveryTries?: number,
-    onRecoveryAbort?: VoidFunction
-}
+export type LogFunction = (message?: string) => void;
+
+type DefaultSettings = Partial<IConfig>;
 
 export interface IConfig {
     refreshBuffer: number,
     header: string,
     formatter: Formatter,
-    onTokenRefresh: VoidFunction,
-    onAuthFail: VoidFunction,
+    onTokenRefresh: LogFunction,
+    onAuthFail: LogFunction,
     onTokenRequestFail: VoidFunction,
     refreshOnStatus: number [],
     tokenTryThreshold: number,
     onTokenTryThreshold: (retries: number) => void,
-    onRecoveryTry: VoidFunction,
+    onRecoveryTry: LogFunction,
     maxRecoveryTries: number,
-    onRecoveryAbort: VoidFunction
+    onRecoveryAbort: VoidFunction,
+    addTokenToLogs: boolean,
 }
 
 export interface IToken {
