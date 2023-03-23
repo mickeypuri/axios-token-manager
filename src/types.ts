@@ -20,6 +20,7 @@ export interface IDefaultSettings {
     refreshOnStatus?: number [],
     tokenTryThreshold?: number,
     onTokenTryThreshold?: (retries: number) => void,
+    onRecoveryTry: VoidFunction,
     maxRecoveryTries?: number,
     onRecoveryAbort?: VoidFunction
 }
@@ -34,6 +35,7 @@ export interface IConfig {
     refreshOnStatus: number [],
     tokenTryThreshold: number,
     onTokenTryThreshold: (retries: number) => void,
+    onRecoveryTry: VoidFunction,
     maxRecoveryTries: number,
     onRecoveryAbort: VoidFunction
 }

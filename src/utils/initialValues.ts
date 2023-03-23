@@ -16,6 +16,7 @@ export const defaultSettings: IConfig = {
     refreshOnStatus: [401],
     tokenTryThreshold: 10,
     onTokenTryThreshold: noop,
+    onRecoveryTry: noop,
     maxRecoveryTries: 5,
     onRecoveryAbort: noop
 };
