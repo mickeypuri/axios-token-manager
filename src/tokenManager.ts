@@ -56,9 +56,10 @@ const errorInterceptor = async (error: AxiosError) => {
         const { config } = response as AxiosResponse;
         const { token } = cache;
         const { access_token } = token as IToken;
-        const { header, formatter, onRecoveryTry } = options;
+        const { header, formatter, onRecoveryTry, addTokenToLogs } = options;
         (config.headers as AxiosHeaders)[header] = formatter(access_token);
-        onRecoveryTry();
+        const message = addTokenToLogs ? `Using token: ${access_token}.` : '';
+        onRecoveryTry(message);
         return _instance(config);
     } else {
         return Promise.reject(error);
