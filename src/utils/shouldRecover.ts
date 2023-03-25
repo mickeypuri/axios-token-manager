@@ -1,6 +1,7 @@
 import { AxiosError } from 'axios';
 import { getState, updateState } from '../state';
 import { IToken } from '../types';
+import { initCache } from './initialValues';
 
 export const shouldRecover = (error: AxiosError) => {
     const { options, cache : { token }, recoveryTries } = getState();
@@ -20,16 +21,18 @@ export const shouldRecover = (error: AxiosError) => {
         if (recoveryTries < maxRecoveryTries) {
             updateState({
                 inRecovery: true,
-                recoveryTries: recoveryTries + 1
+                recoveryTries: recoveryTries + 1,
+                cache: initCache
             });
             return true;
         } 
         else {
-            onRecoveryAbort();
             updateState({
                 inRecovery: false,
-                recoveryTries: 0
+                recoveryTries: 0,
+                cache: initCache
             });
+            onRecoveryAbort();
         }
     }
 
