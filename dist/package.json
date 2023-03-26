@@ -1,6 +1,6 @@
 {
   "name": "axios-token-manager",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A manager for Auth Tokens using Axios in a Node API Server or a JS Client",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",

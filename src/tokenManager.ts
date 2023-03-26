@@ -56,7 +56,7 @@ const errorInterceptor = async (error: AxiosError) => {
         const { options } = getState();
         const { response } = error;
         const { config } = response as AxiosResponse;
-        const { access_token } = token as IToken;
+        const { access_token } = token;
         const { header, formatter, onRecoveryTry, addTokenToLogs } = options;
         (config.headers)[header] = formatter(access_token);
         const message = addTokenToLogs ? `Using token: ${access_token}.` : '';
