@@ -35,14 +35,16 @@ const errorInterceptor = async (error: AxiosError) => {
     const needsToRecover = shouldRecover(error);
 
     if (needsToRecover) {
+        let token : IToken;
         await lock.acquire();
         const { cache, getCredentials } = getState();
 
         if (isTokenValid(cache)) {
+            token = cache.token as IToken;
             lock.release();
         } else {
             try {
-                await getFreshToken(getCredentials);
+                token = await getFreshToken(getCredentials);
             }
             catch (error) {
                 return Promise.reject(error);
@@ -54,10 +56,9 @@ const errorInterceptor = async (error: AxiosError) => {
         const { options } = getState();
         const { response } = error;
         const { config } = response as AxiosResponse;
-        const { token } = cache;
         const { access_token } = token as IToken;
         const { header, formatter, onRecoveryTry, addTokenToLogs } = options;
-        (config.headers as AxiosHeaders)[header] = formatter(access_token);
+        (config.headers)[header] = formatter(access_token);
         const message = addTokenToLogs ? `Using token: ${access_token}.` : '';
         onRecoveryTry(message);
         return _instance(config);
