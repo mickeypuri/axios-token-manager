@@ -29,8 +29,7 @@ const getMockAxiosInstance = () => ({
     }
 }) as unknown as AxiosInstance;
 
-describe('tokenManager', () => {
-    describe('initialisation', () => {
+describe('tokenManager initialisation', () => {
         it('sets options to default settings if values not provided', () => {
             const instance = getMockAxiosInstance();
             tokenManager({ instance, getCredentials });
@@ -61,6 +60,19 @@ describe('tokenManager', () => {
             tokenManager({ instance, getCredentials, tokenTryThreshold, onTokenRefresh, header });
             const { options } = getState();
             expect(options).toEqual(expectedOptions);
-        });     
-    });
+        });
+
+        it('is set up to intercept all requests', () => {
+            const instance = getMockAxiosInstance();
+            tokenManager({ instance, getCredentials });
+            const { interceptors : { request : { use : requestInterceptMock }}} = instance;
+            expect((requestInterceptMock as jest.Mock)).toBeCalledTimes(1);
+        });
+
+        it('is set up to intercept all responses', () => {
+            const instance = getMockAxiosInstance();
+            tokenManager({ instance, getCredentials });
+            const { interceptors : { response : { use : responseInterceptMock }}} = instance;
+            expect((responseInterceptMock as jest.Mock)).toBeCalledTimes(1);
+        });
 });
