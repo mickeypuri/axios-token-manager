@@ -30,10 +30,37 @@ const getMockAxiosInstance = () => ({
 }) as unknown as AxiosInstance;
 
 describe('tokenManager', () => {
-    it('sets options to default settings if values not provided', () => {
-        const instance = getMockAxiosInstance();
-        tokenManager({ instance, getCredentials });
-        const { options } = getState();
-        expect(options).toEqual(defaultSettings);
+    describe('initialisation', () => {
+        it('sets options to default settings if values not provided', () => {
+            const instance = getMockAxiosInstance();
+            tokenManager({ instance, getCredentials });
+            const { options } = getState();
+            expect(options).toEqual(defaultSettings);
+        });
+
+        it('sets rest of options to default settings and uses two options provided', () => {
+            const instance = getMockAxiosInstance();
+
+            const maxRecoveryTries = 10;
+            const onAuthFail = () => console.log('Authorisation has failed');
+            const expectedOptions = {...defaultSettings, maxRecoveryTries, onAuthFail };
+
+            tokenManager({ instance, getCredentials, maxRecoveryTries, onAuthFail });
+            const { options } = getState();
+            expect(options).toEqual(expectedOptions);
+        });
+
+        it('sets rest of options to default settings and uses the three options provided', () => {
+            const instance = getMockAxiosInstance();
+
+            const tokenTryThreshold = 10;
+            const onTokenRefresh = () => console.log('Authorisation has failed');
+            const header = 'Test Header';
+            const expectedOptions = {...defaultSettings, tokenTryThreshold, onTokenRefresh, header };
+
+            tokenManager({ instance, getCredentials, tokenTryThreshold, onTokenRefresh, header });
+            const { options } = getState();
+            expect(options).toEqual(expectedOptions);
+        });     
     });
 });
