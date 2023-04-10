@@ -8,7 +8,9 @@ const baseURL = 'https://api.news.com';
 const channelsPath = '/channel';
 const channels = ['bbc', 'itv', 'netflix', 'prime'];
 
-const token_one: IToken = { access_token: 'token 1',
+const ACCESS_TOKEN = 'token 1';
+
+const token_one: IToken = { access_token: ACCESS_TOKEN,
     token_type: 'Bearer',
     expires_in: 300,
     scope: 'scope'
@@ -18,7 +20,7 @@ beforeAll(() => {
     nock(baseURL, {
         reqheaders: {
             "accept": "application/json, text/plain, */*",
-            "authorization": "Bearer token 1",
+            "authorization": `Bearer ${ACCESS_TOKEN}`,
             "user-agent": "axios/1.3.4",
             "accept-encoding": "gzip, compress, deflate, br"
         }
@@ -55,7 +57,10 @@ describe('tokenManager caching', () => {
         tokenManager({ instance, getCredentials });
         await instance.get(`${baseURL}${channelsPath}`);
 
-        expect((getCredentials as jest.Mock)).toBeCalledTimes(1);
+        const { cache: { token } } = getState();
+        const { access_token } = token as IToken
+
+        expect (access_token).toEqual(ACCESS_TOKEN);
     });
 
     it('after start up it gets token in first call, then uses cached token for next four calls', async () => {
