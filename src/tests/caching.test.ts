@@ -3,16 +3,18 @@ import nock from 'nock';
 import { IToken, TokenProvider } from '../types';
 import tokenManager from '../tokenManager';
 import { getState } from '../state';
+import { defaultSettings } from '../utils/initialValues';
 
 const baseURL = 'https://api.news.com';
 const channelsPath = '/channel';
 const channels = ['bbc', 'itv', 'netflix', 'prime'];
 
 const ACCESS_TOKEN = 'token 1';
+const EXPIRES_IN = 300;
 
 const token_one: IToken = { access_token: ACCESS_TOKEN,
     token_type: 'Bearer',
-    expires_in: 300,
+    expires_in: EXPIRES_IN,
     scope: 'scope'
 };
 
@@ -61,6 +63,23 @@ describe('tokenManager caching', () => {
         const { access_token } = token as IToken
 
         expect (access_token).toEqual(ACCESS_TOKEN);
+    });
+
+    it('sets the cache expiration after getting the token', async () => {
+        const getCredentials: TokenProvider = jest.fn();
+        const instance = axios.create({ baseURL });
+        const { refreshBuffer } = defaultSettings;
+        (getCredentials as jest.Mock).mockResolvedValue(token_one);
+        tokenManager({ instance, getCredentials });
+        await instance.get(`${baseURL}${channelsPath}`);
+
+        const expectedExpiry = Date.now() + (EXPIRES_IN - refreshBuffer) * 1000;
+        const { cache : { expiration }} = getState();
+
+        const expectedExpirySecs = Math.floor(expectedExpiry/1000);
+        const actualExpirySecs = Math.floor(expiration/1000);
+
+        expect(actualExpirySecs).toEqual(expectedExpirySecs);
     });
 
     it('after start up it gets token in first call, then uses cached token for next four calls', async () => {
