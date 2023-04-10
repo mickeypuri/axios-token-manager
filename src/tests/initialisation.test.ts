@@ -75,4 +75,10 @@ describe('tokenManager initialisation', () => {
             const { interceptors : { response : { use : responseInterceptMock }}} = instance;
             expect((responseInterceptMock as jest.Mock)).toBeCalledTimes(1);
         });
+
+        it('will not invoke getCredentials at initialisation', () => {
+            const instance = getMockAxiosInstance();
+            tokenManager({ instance, getCredentials });
+            expect((getCredentials as jest.Mock)).not.toBeCalled();
+        });
 });
