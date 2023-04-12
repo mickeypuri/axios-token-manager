@@ -10,11 +10,12 @@ const channelsPath = '/channel';
 const channels = ['bbc', 'itv', 'netflix', 'prime'];
 
 const ACCESS_TOKEN = 'token 1';
-const EXPIRES_IN = 300;
+const EXPIRES_IN_SECS = 300;
 
-const token_one: IToken = { access_token: ACCESS_TOKEN,
+const token_one: IToken = { 
+    access_token: ACCESS_TOKEN,
     token_type: 'Bearer',
-    expires_in: EXPIRES_IN,
+    expires_in: EXPIRES_IN_SECS,
     scope: 'scope'
 };
 
@@ -73,7 +74,7 @@ describe('tokenManager caching', () => {
         tokenManager({ instance, getCredentials });
         await instance.get(`${baseURL}${channelsPath}`);
 
-        const expectedExpiry = Date.now() + (EXPIRES_IN - refreshBuffer) * 1000;
+        const expectedExpiry = Date.now() + (EXPIRES_IN_SECS - refreshBuffer) * 1000;
         const { cache : { expiration }} = getState();
 
         const expectedExpirySecs = Math.floor(expectedExpiry/1000);
@@ -113,4 +114,25 @@ describe('tokenManager caching', () => {
 
         expect((getCredentials as jest.Mock)).toBeCalledTimes(1);
     });
+
+    it('when the expiry time of cached token has passed it makes a call for a new token', async () => {
+        const getCredentials: TokenProvider = jest.fn();
+        const instance = axios.create({ baseURL });
+        (getCredentials as jest.Mock).mockResolvedValue(token_one);
+
+        tokenManager({ instance, getCredentials });
+
+        await instance.get(`${baseURL}${channelsPath}`);
+        await instance.get(`${baseURL}${channelsPath}`);
+        await instance.get(`${baseURL}${channelsPath}`);
+
+        // move time forward by 500 seconds
+        const currentTime = Date.now();
+        jest.spyOn(global.Date, 'now').mockImplementation(() => currentTime + 500000);
+
+        await instance.get(`${baseURL}${channelsPath}`);
+
+        expect((getCredentials as jest.Mock)).toBeCalledTimes(2);
+    });
+
 });
