@@ -1,6 +1,6 @@
 import axios from 'axios';
 import nock from 'nock';
-import { IToken, TokenProvider } from '../types';
+import { IToken, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
 import { getState } from '../state';
 import { defaultSettings } from '../utils/initialValues';
@@ -29,7 +29,9 @@ const token_two: IToken = {
     scope: 'scope'
 };
 
-beforeAll(() => {
+beforeEach(() => {
+    jest.resetAllMocks;
+
     nock(baseURL, {
         reqheaders: {
             "accept": "application/json, text/plain, */*",
@@ -55,10 +57,6 @@ beforeAll(() => {
     .get(schedulePath)
     .times(4)
     .reply(200, { schedules });
-});
-
-beforeEach(() => {
-    jest.resetAllMocks;
 });
 
 afterAll(() => {
@@ -89,6 +87,29 @@ describe('tokenManager caching', () => {
 
 
         expect((getCredentials as jest.Mock)).toBeCalledTimes(2);
+    });
+
+    it('on getting a 401 it tries to recover and get a fresh token and retry and calls the onRecoveryTry callback', async () => {
+        const getCredentials: TokenProvider = jest.fn();
+        const onRecoveryTry: LogFunction = jest.fn();
+        const instance = axios.create({ baseURL });
+        (getCredentials as jest.Mock)
+            .mockResolvedValueOnce(token_one)
+            .mockResolvedValueOnce(token_two);
+
+
+        tokenManager({ instance, getCredentials, onRecoveryTry });
+
+        await instance.get(`${baseURL}${channelsPath}`);    // uses token 1
+        await instance.get(`${baseURL}${channelsPath}`);
+        await instance.get(`${baseURL}${channelsPath}`);
+
+        await instance.get(`${baseURL}${schedulePath}`);    // call will fail with a 401, we intercept the 401 and get another token, token 2, and retry with that
+        await instance.get(`${baseURL}${schedulePath}`);
+        await instance.get(`${baseURL}${schedulePath}`);
+        await instance.get(`${baseURL}${schedulePath}`);
+
+        expect((onRecoveryTry as jest.Mock)).toBeCalledTimes(1);
     });
 
 });
