@@ -135,4 +135,35 @@ describe('tokenManager caching', () => {
         expect((getCredentials as jest.Mock)).toBeCalledTimes(2);
     });
 
+    it('further testing that when expiry time of cached token has passed it makes a call for a new token', async () => {
+        const getCredentials: TokenProvider = jest.fn();
+        (getCredentials as jest.Mock).mockResolvedValue(token_one);
+
+        let timePassed = 0;
+        const currentTime = Date.now();
+        jest.spyOn(global.Date, 'now').mockImplementation(() => currentTime + timePassed);
+
+        const instance = axios.create({ baseURL });
+        tokenManager({ instance, getCredentials });
+
+        await instance.get(`${baseURL}${channelsPath}`);    // gets first token with 300 sec expiry
+        await instance.get(`${baseURL}${channelsPath}`);
+        await instance.get(`${baseURL}${channelsPath}`);
+
+        timePassed = 500000;   // move time forward by 500 seconds
+
+        await instance.get(`${baseURL}${channelsPath}`);    // gets a new token
+        await instance.get(`${baseURL}${channelsPath}`);
+        await instance.get(`${baseURL}${channelsPath}`);
+        await instance.get(`${baseURL}${channelsPath}`);
+
+        timePassed = 1000000;
+
+        await instance.get(`${baseURL}${channelsPath}`);    // gets another new token
+        await instance.get(`${baseURL}${channelsPath}`);
+        await instance.get(`${baseURL}${channelsPath}`);     
+
+        expect((getCredentials as jest.Mock)).toBeCalledTimes(3);
+    });
+
 });
