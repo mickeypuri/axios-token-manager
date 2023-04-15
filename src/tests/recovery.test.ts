@@ -68,7 +68,7 @@ afterAll(() => {
 
 describe('tokenManager caching', () => {
 
-    it('after start up it gets token in first call, then uses cached token for next four calls', async () => {
+    it('on getting a 401 it tries to recover by getting another token and retries with the fresh token', async () => {
         const getCredentials: TokenProvider = jest.fn();
         const instance = axios.create({ baseURL });
         (getCredentials as jest.Mock)
