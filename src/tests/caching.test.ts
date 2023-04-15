@@ -167,5 +167,4 @@ describe('tokenManager caching', () => {
 
         expect((getCredentials as jest.Mock)).toBeCalledTimes(3);
     });
-
 });

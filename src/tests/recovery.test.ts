@@ -89,8 +89,10 @@ describe('tokenManager caching', () => {
         expect((getCredentials as jest.Mock)).toBeCalledTimes(2);
     });
 
-    it('on getting a 401 it tries to recover and get a fresh token and retry and calls the onRecoveryTry callback', async () => {
+    it('on getting a 401 it tries to recover and get a fresh token and retry and calls the onAuthFail and onRecoveryTry and onTokenRefresh callback', async () => {
         const getCredentials: TokenProvider = jest.fn();
+        const onTokenRefresh: LogFunction = jest.fn();
+        const onAuthFail: LogFunction = jest.fn();
         const onRecoveryTry: LogFunction = jest.fn();
         const instance = axios.create({ baseURL });
         (getCredentials as jest.Mock)
@@ -98,7 +100,7 @@ describe('tokenManager caching', () => {
             .mockResolvedValueOnce(token_two);
 
 
-        tokenManager({ instance, getCredentials, onRecoveryTry });
+        tokenManager({ instance, getCredentials, onRecoveryTry, onAuthFail, onTokenRefresh });
 
         await instance.get(`${baseURL}${channelsPath}`);    // uses token 1
         await instance.get(`${baseURL}${channelsPath}`);
@@ -109,7 +111,8 @@ describe('tokenManager caching', () => {
         await instance.get(`${baseURL}${schedulePath}`);
         await instance.get(`${baseURL}${schedulePath}`);
 
+        expect((onAuthFail as jest.Mock)).toBeCalledTimes(1);
         expect((onRecoveryTry as jest.Mock)).toBeCalledTimes(1);
+        expect((onTokenRefresh as jest.Mock)).toBeCalledTimes(2);
     });
-
 });
