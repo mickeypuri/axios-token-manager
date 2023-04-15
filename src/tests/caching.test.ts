@@ -1,6 +1,6 @@
 import axios from 'axios';
 import nock from 'nock';
-import { IToken, TokenProvider } from '../types';
+import { IToken, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
 import { getState } from '../state';
 import { defaultSettings } from '../utils/initialValues';
@@ -115,12 +115,13 @@ describe('tokenManager caching', () => {
         expect((getCredentials as jest.Mock)).toBeCalledTimes(1);
     });
 
-    it('when the expiry time of cached token has passed it makes a call for a new token', async () => {
+    it('when the expiry time of cached token has passed it makes a call for a new token and calls the onTokenRefresh callback', async () => {
         const getCredentials: TokenProvider = jest.fn();
+        const onTokenRefresh: LogFunction = jest.fn();
         const instance = axios.create({ baseURL });
         (getCredentials as jest.Mock).mockResolvedValue(token_one);
 
-        tokenManager({ instance, getCredentials });
+        tokenManager({ instance, getCredentials, onTokenRefresh });
 
         await instance.get(`${baseURL}${channelsPath}`);
         await instance.get(`${baseURL}${channelsPath}`);
@@ -133,6 +134,7 @@ describe('tokenManager caching', () => {
         await instance.get(`${baseURL}${channelsPath}`);
 
         expect((getCredentials as jest.Mock)).toBeCalledTimes(2);
+        expect((onTokenRefresh as jest.Mock)).toBeCalledTimes(2);
     });
 
     it('further testing that when expiry time of cached token has passed it makes a call for a new token', async () => {
