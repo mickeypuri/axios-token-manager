@@ -90,7 +90,7 @@ describe.only('tokenManager caching', () => {
         await instance.get(`${baseURL}${schedulePath}`);
         await instance.get(`${baseURL}${schedulePath}`);
 
-        expect((onRecoveryTry as jest.Mock)).toBeCalledTimes(1);
+        expect((onRecoveryTry as jest.Mock)).toBeCalledTimes(1);    // tries to recover the failed call
         expect((onTokenRefresh as jest.Mock)).toBeCalledTimes(1);   // does not call for a further token refresh as Token was still valid
         expect((getCredentials as jest.Mock)).toBeCalledTimes(1);   // does not call for a token again as the Token was still valid
     });
