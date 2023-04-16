@@ -92,13 +92,15 @@ describe('tokenManager caching', () => {
         const onTokenRefresh: LogFunction = jest.fn();
         const onAuthFail: LogFunction = jest.fn();
         const onRecoveryTry: LogFunction = jest.fn();
+        const addTokenToLogs = true;
+
         const instance = axios.create({ baseURL });
         (getCredentials as jest.Mock)
             .mockResolvedValueOnce(token_one)
             .mockResolvedValueOnce(token_two);
 
 
-        tokenManager({ instance, getCredentials, onRecoveryTry, onAuthFail, onTokenRefresh });
+        tokenManager({ instance, getCredentials, onRecoveryTry, onAuthFail, onTokenRefresh, addTokenToLogs });
 
         await instance.get(`${baseURL}${channelsPath}`);    // uses token 1
         await instance.get(`${baseURL}${channelsPath}`);
@@ -111,6 +113,7 @@ describe('tokenManager caching', () => {
 
         expect((onAuthFail as jest.Mock)).toBeCalledTimes(1);
         expect((onRecoveryTry as jest.Mock)).toBeCalledTimes(1);
+        expect((onRecoveryTry as jest.Mock)).toBeCalledWith(`Using token: ${ACCESS_TOKEN_TWO}.`);
         expect((onTokenRefresh as jest.Mock)).toBeCalledTimes(2);
     });
 });
