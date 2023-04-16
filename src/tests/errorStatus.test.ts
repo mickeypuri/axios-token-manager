@@ -52,7 +52,7 @@ afterAll(() => {
     nock.restore();
 });
 
-describe.only('tokenManager caching', () => {
+describe('tokenManager caching', () => {
 
     it('on getting a status such as 500 which is not in the list of recovery status it will not try to recover and the request will fail', async () => {
         const getCredentials: TokenProvider = jest.fn();
@@ -72,7 +72,7 @@ describe.only('tokenManager caching', () => {
         await instance.get(`${baseURL}${channelsPath}`);
 
         // next call will fail with a 500, we intercept, see its not in our list to recover from, and allow the request to fail
-        
+
         try {
             await instance.get(`${baseURL}${schedulePath}`);
         } catch (error) {
