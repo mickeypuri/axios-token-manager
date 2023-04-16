@@ -64,7 +64,7 @@ afterAll(() => {
     jest.restoreAllMocks();
 });
 
-describe.only('tokenManager caching', () => {
+describe('tokenManager caching', () => {
 
     it('on getting a 401, if previous failed auth call has fetched a new token then it uses that and will not get a further token', async () => {
 
