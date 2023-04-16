@@ -3,10 +3,10 @@ import nock from 'nock';
 import { IToken, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
 
-// this mocks the shouldRecover function, and forces it to recover when an error
-// but as shouldRecover is mocked, it allows us to skip resetting the cache in this test. 
-// So the cache and token remains valid, which simulates that a previous request has got a new token 
-// and cached it and hence the cache and token are valid
+// This mocks the shouldRecover function, and forces it to recover when any error
+// As shouldRecover is mocked, it allows us to skip resetting the cache in this test. 
+// So the cache and token remains valid, which simulates situation that a previous request has got a new token 
+// and has cached it and hence the cache and token are valid
 
 jest.mock('../utils/shouldRecover', () => ({
     shouldRecover: () => true
