@@ -2,8 +2,6 @@ import axios from 'axios';
 import nock from 'nock';
 import { IToken, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
-import { getState } from '../state';
-import { defaultSettings } from '../utils/initialValues';
 
 const baseURL = 'https://api.news.com';
 const channelsPath = '/channel';
