@@ -1,9 +1,10 @@
 import { AxiosError } from 'axios';
 import { shouldRecover } from '../utils/shouldRecover';
 import { defaultSettings } from '../utils/initialValues';
-import { IToken } from '../types';
+import { IToken, LogFunction } from '../types';
 
-import { getState } from '../state';
+import { getState, updateState } from '../state';
+import { initCache } from '../utils/initialValues';
 
 jest.mock('../state');
 
@@ -31,4 +32,33 @@ describe.only('shouldRecover from error', () => {
         expect(returnValue).toBe(false);
     });
 
+    it('will abort recovery and reset state if recovery tries is equal to max tries', () => {
+        const onRecoveryAbort: LogFunction = jest.fn();
+        const { maxRecoveryTries } = defaultSettings;
+
+        (getState as jest.Mock).mockImplementationOnce(() => ({
+            cache: { token, expiration: 0 },
+            options: { ...defaultSettings, onRecoveryAbort },
+            tokenTries: 0,
+            recoveryTries: maxRecoveryTries,
+            inRecovery: true,
+            getCredentials: jest.fn()
+        }));
+
+        const error = {
+            response: {
+                status: 401
+            }
+        } as unknown as AxiosError;
+
+        const returnValue = shouldRecover(error);
+
+        expect((updateState as jest.Mock)).toBeCalledWith({
+            inRecovery: false,
+            recoveryTries: 0,
+            cache: initCache
+        });
+        expect((onRecoveryAbort as jest.Mock)).toBeCalledTimes(1);
+        expect(returnValue).toBe(false);
+    });
 });
