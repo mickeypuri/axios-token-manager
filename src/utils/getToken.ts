@@ -14,9 +14,10 @@ export const getToken  = async (lock : Semaphore) => {
     await lock.acquire();
 
     // check if previous request updated token while this request waited
-    if (isTokenValid(cache)) {
+    const { cache: currentCache } = getState();
+    if (isTokenValid(currentCache)) {
         lock.release();
-        const { token } = cache;
+        const { token } = currentCache;
         return Promise.resolve(token as IToken);
     }
 
