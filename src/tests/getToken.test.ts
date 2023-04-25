@@ -87,6 +87,7 @@ describe ('getToken', () => {
             actualError = error;
         }
 
+        expect(getFreshToken as jest.Mock).toBeCalledTimes(1);
         expect(actualError).toEqual(getFreshTokenError);
         expect((lock.release as jest.Mock)).toBeCalledTimes(1);        
     });
