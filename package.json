@@ -5,7 +5,7 @@
   "author": "Mickey Puri",
   "license": "MIT",
   "scripts": {
-    "compile": "rimraf dist/lib && tsc && tsc --build tsconfig.es5.json",
+    "build": "rimraf dist/lib && tsc && tsc --build tsconfig.es5.json",
     "eslint": "eslint src/index.ts",
     "test": "jest --coverage --runInBand",
     "test:watch": "jest --watch"
