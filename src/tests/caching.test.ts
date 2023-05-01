@@ -77,8 +77,8 @@ describe('tokenManager caching', () => {
         const expectedExpiry = Date.now() + (EXPIRES_IN_SECS - refreshBuffer) * 1000;
         const { cache : { expiration }} = getState();
 
-        const expectedExpirySecs = Math.floor(expectedExpiry/1000);
-        const actualExpirySecs = Math.floor(expiration/1000);
+        const expectedExpirySecs = Math.round(expectedExpiry/1000);
+        const actualExpirySecs = Math.round(expiration/1000);
 
         expect(actualExpirySecs).toEqual(expectedExpirySecs);
     });
