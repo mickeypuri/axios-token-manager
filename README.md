@@ -1,4 +1,4 @@
-<div style="display:flex; justify-content: center; align-items: center;">
+<div align="center">
     <h1>
         axios-token-manager
     </h1>
@@ -7,7 +7,7 @@
     </p>
 </div>
 
-<div style="display:flex; justify-content: center; align-items: center;">
+<div align="center">
 
 
 [![CI](https://github.com/mickeypuri/axios-token-manager/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mickeypuri/axios-token-manager/actions/workflows/ci.yml?branch=main)
