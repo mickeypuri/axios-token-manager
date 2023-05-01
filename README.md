@@ -1,6 +1,6 @@
 # axios-token-manager
 
-### A library to manage caching of Axios Tokens with automatic refresh of Token on expiry or on error
+A library to manage caching of Axios Tokens with automatic refresh of Token on expiry or on error
 
 <div style="margin: 1.5em">
 
