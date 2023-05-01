@@ -1,11 +1,13 @@
-<div align="center">
-    <b>
+<div style="text-align: center;">
+    <h1>
         axios-token-manager
-    </b>
-    Library project to manage Axios Tokens
+    </h1>
+    <p>
+        A Library to manage caching of Axios Tokens with automatic refresh of Token on expiry or on error response in case token revoked prior to its expiration period being up.
+    </p>
 </div>
 
-<div align="center">
+<div style="text-align: center;">
 
 
 [![CI](https://github.com/mickeypuri/axios-token-manager/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mickeypuri/axios-token-manager/actions/workflows/ci.yml?branch=main)
