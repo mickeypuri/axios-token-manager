@@ -16,6 +16,7 @@ A library to manage caching of Axios Tokens with automatic refresh of Token on e
 - [Purpose](#purpose)
 - [Features](#features)
 - [Installing](#installing)
+- [Usage](#usage)
 - [Axios Token Manager API](#axios-token-manager-api)
 
 ## Purpose
@@ -66,6 +67,56 @@ Once the package is installed, you can import the library using `import` or `req
 If you use `require` for importing:
 
 `const tokenManager = require('axios');`
+
+## Usage
+
+This defines a file which has a default export of an axios instance wired up with the axios-token-manager. 
+
+The axios-oauth-client has been used here only as an example in the implementation of the function to get a new Token, but axios-oauth-client can be replaced by your preferred oauth or token library, or your own implementation to get a token.
+
+**note**: `instance` and `getCredentials` are the two required settings, the rest are optional.
+
+```ts
+import axios from 'axios';
+import tokenManager, { TokenProvider, ITokenManager } from 'axios-token-manager';
+import oauth from 'axios-oauth-client';
+
+// Define an Axios instance using a baseURL, timeout and common headers for all requests
+ ...
+
+const instance = axios.create({
+    baseURL,
+    timeout,
+    headers
+});
+
+// define tokenURL to fetch the authorization token from, a clientId and a client secret
+...
+
+const getCredentials = oauth.clientCredentials(
+    axios.create(),
+    tokenURL,
+    clientId,
+    clientSecret
+) as TokenProvider;
+
+// define other optional settings for callbacks and other configurations (see API for config)
+...
+
+const settings: ITokenManager = {
+    instance,
+    getCredentials,
+    ...                     // optional settings
+};
+
+tokenManager(settings);
+
+export default instance;
+```
+
+## Axios Token Manager API
+
+
 
 
 
