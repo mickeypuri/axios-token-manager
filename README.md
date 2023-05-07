@@ -74,7 +74,7 @@ This defines a file which has a default export of an axios instance wired up wit
 
 The axios-oauth-client has been used here only as an example in the implementation of the function to get a new Token, but axios-oauth-client can be replaced by your preferred oauth or token library, or your own implementation to get a token.
 
-**note**: `instance` and `getCredentials` are the two required settings, the rest are optional.
+**note**: `instance` and `getCredentials` are the two required configuration settings, the other settings are optional.
 
 ```ts
 import axios from 'axios';
@@ -106,7 +106,7 @@ const getCredentials = oauth.clientCredentials(
 const settings: ITokenManager = {
     instance,
     getCredentials,
-    ...                     // optional settings
+    ...                     // define other optional configuration 
 };
 
 tokenManager(settings);
