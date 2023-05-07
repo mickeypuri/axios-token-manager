@@ -44,7 +44,7 @@ In case callers want to be kept aware of what is happening under the hood there 
 - Monitors response and in case of a 401, it fetches a new Authentication token and retries the request with fresh token
 - After recovery from an early revokation of the Authentication token, it caches the fresh token
 - Adds interceptors on the Request and Response of the provided Axios Instance
-- Callbacks to notify calling applicatin of token refresh, authentication fail, recovery try and recovery abort
+- Callbacks to notify calling application of token refresh, authentication fail, recovery try and recovery abort
 - Format and configure authentication header
 - Full Configuration of settings
 
