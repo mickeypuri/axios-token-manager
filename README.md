@@ -72,16 +72,16 @@ If you use `require` for importing:
 
 This defines a file which has a default export of an axios instance wired up with the axios-token-manager. 
 
-The axios-oauth-client has been used here only as an example in the implementation of the function to get a new Token, but axios-oauth-client can be replaced by your preferred oauth or token library, or your own implementation to get a token.
+The axios-oauth-client library has been used here as an example for the implementation of the function to get a new Token, it can of course be replaced by your preferred oauth or token library, or your own implementation to get a token.
 
-**note**: `instance` and `getCredentials` are the two required configuration settings, the other settings are optional.
+**note**: `instance` and `getCredentials` are the two required configuration settings, the other settings are all optional.
 
 ```ts
 import axios from 'axios';
-import tokenManager, { TokenProvider, ITokenManager } from 'axios-token-manager';
 import oauth from 'axios-oauth-client';
+import tokenManager, { TokenProvider, ITokenManager } from 'axios-token-manager';
 
-// Define an Axios instance using a baseURL, timeout and common headers for all requests
+// Define an Axios instance using a common baseURL, timeout and the common headers for all requests
  ...
 
 const instance = axios.create({
@@ -114,6 +114,29 @@ tokenManager(settings);
 export default instance;
 ```
 
+### Using all configurable options
+
+The above example only used the two required settings. Below is an example using all the settings.
+
+```ts
+const settings: ITokenManager = {
+    instance,
+    getCredentials,
+    formatter,
+    refreshOnStatus,
+    addTokenToLogs,
+    onTokenRefresh,
+    onAuthFail,
+    onTokenRequestFail,
+    onRecoveryTry,
+    onTokenTryThreshold,
+    onRecoveryAbort,
+};
+
+tokenManager(settings);
+
+export default instance;
+```
 ## Axios Token Manager API
 
 
