@@ -1,6 +1,6 @@
 import axios from 'axios';
 import nock from 'nock';
-import { IToken, TokenProvider, LogFunction } from '../types';
+import { Token, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
 
 // This mocks the shouldRecover function, and forces it to recover when there is an error
@@ -22,14 +22,14 @@ const ACCESS_TOKEN_ONE = 'Token One';
 const ACCESS_TOKEN_TWO = 'Token Two';
 const EXPIRES_IN_SECS = 300;
 
-const token_one: IToken = { 
+const token_one: Token = { 
     access_token: ACCESS_TOKEN_ONE,
     token_type: 'Bearer',
     expires_in: EXPIRES_IN_SECS,
     scope: 'scope'
 };
 
-const token_two: IToken = { 
+const token_two: Token = { 
     access_token: ACCESS_TOKEN_TWO,
     token_type: 'Bearer',
     expires_in: EXPIRES_IN_SECS,

@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import nock from 'nock';
-import { IToken, TokenProvider, LogFunction } from '../types';
+import { Token, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
 
 const baseURL = 'https://api.news.com';
@@ -11,7 +11,7 @@ const channels = ['bbc', 'itv', 'netflix', 'prime'];
 const ACCESS_TOKEN_ONE = 'Token One';
 const EXPIRES_IN_SECS = 300;
 
-const token_one: IToken = { 
+const token_one: Token = { 
     access_token: ACCESS_TOKEN_ONE,
     token_type: 'Bearer',
     expires_in: EXPIRES_IN_SECS,

@@ -1,4 +1,4 @@
-import { IToken } from '../types';
+import { Token } from '../types';
 import Semaphore from 'semaphore-async-await';
 import { getState } from '../state';
 import { isTokenValid } from './isTokenValid';
@@ -8,7 +8,7 @@ export const getToken  = async (lock : Semaphore) => {
     const { cache, getCredentials } = getState();
     if (isTokenValid(cache)) {
         const { token } = cache;
-        return Promise.resolve(token as IToken);
+        return Promise.resolve(token as Token);
     }
 
     await lock.acquire();
@@ -18,7 +18,7 @@ export const getToken  = async (lock : Semaphore) => {
     if (isTokenValid(currentCache)) {
         lock.release();
         const { token } = currentCache;
-        return Promise.resolve(token as IToken);
+        return Promise.resolve(token as Token);
     }
 
     try {

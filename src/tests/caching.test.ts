@@ -1,6 +1,6 @@
 import axios from 'axios';
 import nock from 'nock';
-import { IToken, TokenProvider, LogFunction } from '../types';
+import { Token, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
 import { getState } from '../state';
 import { defaultSettings } from '../utils/initialValues';
@@ -12,7 +12,7 @@ const channels = ['bbc', 'itv', 'netflix', 'prime'];
 const ACCESS_TOKEN = 'token 1';
 const EXPIRES_IN_SECS = 300;
 
-const token_one: IToken = { 
+const token_one: Token = { 
     access_token: ACCESS_TOKEN,
     token_type: 'Bearer',
     expires_in: EXPIRES_IN_SECS,
@@ -61,7 +61,7 @@ describe('tokenManager caching', () => {
         await instance.get(`${baseURL}${channelsPath}`);
 
         const { cache: { token } } = getState();
-        const { access_token } = token as IToken
+        const { access_token } = token as Token
 
         expect (access_token).toEqual(ACCESS_TOKEN);
     });

@@ -1,6 +1,6 @@
 import { AxiosError, AxiosHeaders, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
 import Semaphore from 'semaphore-async-await';
-import { Settings, IToken } from './types';
+import { Settings, Token } from './types';
 import { defaultSettings } from './utils/initialValues';
 import { getFreshToken } from './utils/getFreshToken';
 import { isTokenValid } from './utils/isTokenValid';
@@ -35,12 +35,12 @@ const errorInterceptor = async (error: AxiosError) => {
     const needsToRecover = shouldRecover(error);
 
     if (needsToRecover) {
-        let token : IToken;
+        let token : Token;
         await lock.acquire();
         const { cache, getCredentials } = getState();
 
         if (isTokenValid(cache)) {
-            token = cache.token as IToken;
+            token = cache.token as Token;
             lock.release();
         } else {
             try {

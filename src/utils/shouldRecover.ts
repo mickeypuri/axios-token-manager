@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios';
 import { getState, updateState } from '../state';
-import { IToken } from '../types';
+import { Token } from '../types';
 import { initCache } from './initialValues';
 
 export const shouldRecover = (error: AxiosError) => {
@@ -14,7 +14,7 @@ export const shouldRecover = (error: AxiosError) => {
     const authFailed = refreshOnStatus.includes(status as number);
 
     if (authFailed) {
-        const { access_token } = token as IToken;
+        const { access_token } = token as Token;
         const message = addTokenToLogs ? `Used token: ${access_token}` : '';
         onAuthFail(message);
 

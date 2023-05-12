@@ -1,14 +1,14 @@
 import { AxiosError } from 'axios';
 import { shouldRecover } from '../utils/shouldRecover';
 import { defaultSettings } from '../utils/initialValues';
-import { IToken, LogFunction } from '../types';
+import { Token, LogFunction } from '../types';
 
 import { getState, updateState } from '../state';
 import { initCache } from '../utils/initialValues';
 
 jest.mock('../state');
 
-const token: IToken = {
+const token: Token = {
     access_token: 'Token One',
     token_type: 'Bearer',
     expires_in: 0,

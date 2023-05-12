@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 
 export interface Cache {
-    token: IToken | null;
+    token: Token | null;
     expiration: number;
 }
 
@@ -30,7 +30,7 @@ export interface Config {
     addTokenToLogs: boolean;
 }
 
-export interface IToken {
+export interface Token {
     access_token: string;
     token_type: string;
     expires_in: number;
@@ -46,6 +46,6 @@ export interface State {
     getCredentials: TokenProvider;
 }
 
-export type TokenProvider = () => Promise<IToken>;
+export type TokenProvider = () => Promise<Token>;
 
 export type Formatter = (accessToken: string) => string;
