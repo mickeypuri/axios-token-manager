@@ -1,6 +1,6 @@
 import { AxiosError, AxiosHeaders, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig} from 'axios';
 import Semaphore from 'semaphore-async-await';
-import { ITokenManager, IToken } from './types';
+import { Settings, IToken } from './types';
 import { defaultSettings } from './utils/initialValues';
 import { getFreshToken } from './utils/getFreshToken';
 import { isTokenValid } from './utils/isTokenValid';
@@ -67,7 +67,7 @@ const errorInterceptor = async (error: AxiosError) => {
     }
 };
 
-const tokenManager = (settings: ITokenManager) => {
+const tokenManager = (settings: Settings) => {
     const { instance, getCredentials, ...rest} = settings;
     _instance = instance;
     const options = {...defaultSettings, ...rest };

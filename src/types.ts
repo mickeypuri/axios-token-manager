@@ -5,7 +5,7 @@ export interface ICache {
     expiration: number;
 }
 
-export interface ITokenManager extends DefaultSettings {
+export interface Settings extends DefaultSettings {
     instance: AxiosInstance;
     getCredentials: TokenProvider;
 }
