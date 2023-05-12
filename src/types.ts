@@ -1,6 +1,6 @@
 import { AxiosInstance } from 'axios';
 
-export interface ICache {
+export interface Cache {
     token: IToken | null;
     expiration: number;
 }
@@ -38,7 +38,7 @@ export interface IToken {
 }
 
 export interface IState {
-    cache: ICache;
+    cache: Cache;
     options: Config;
     tokenTries: number;
     recoveryTries: number;

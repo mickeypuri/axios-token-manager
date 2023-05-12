@@ -1,7 +1,7 @@
-import { ICache, Config } from '../types';
+import { Cache, Config } from '../types';
 import { noop } from './noop';
 
-export const initCache: ICache = {
+export const initCache: Cache = {
     token: null,
     expiration: 0
 };
