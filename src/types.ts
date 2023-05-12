@@ -37,7 +37,7 @@ export interface IToken {
     scope: string;
 }
 
-export interface IState {
+export interface State {
     cache: Cache;
     options: Config;
     tokenTries: number;
