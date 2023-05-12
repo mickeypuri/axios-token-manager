@@ -1,7 +1,7 @@
-import { IToken, TokenProvider } from '../types';
+import { Token, TokenProvider } from '../types';
 import { getState, updateState } from '../state';
 
-export const getFreshToken = async (getCredentials :TokenProvider) : Promise<IToken> => {
+export const getFreshToken = async (getCredentials :TokenProvider) : Promise<Token> => {
     const {options} = getState();
 
     try {

@@ -1,20 +1,20 @@
 import { AxiosInstance } from 'axios';
 
-export interface ICache {
-    token: IToken | null;
+export interface Cache {
+    token: Token | null;
     expiration: number;
 }
 
-export interface ITokenManager extends DefaultSettings {
+export interface Settings extends DefaultSettings {
     instance: AxiosInstance;
     getCredentials: TokenProvider;
 }
 
 export type LogFunction = (message?: string) => void;
 
-type DefaultSettings = Partial<IConfig>;
+type DefaultSettings = Partial<Config>;
 
-export interface IConfig {
+export interface Config {
     refreshBuffer: number;
     header: string;
     formatter: Formatter;
@@ -30,22 +30,22 @@ export interface IConfig {
     addTokenToLogs: boolean;
 }
 
-export interface IToken {
+export interface Token {
     access_token: string;
     token_type: string;
     expires_in: number;
     scope: string;
 }
 
-export interface IState {
-    cache: ICache;
-    options: IConfig;
+export interface State {
+    cache: Cache;
+    options: Config;
     tokenTries: number;
     recoveryTries: number;
     inRecovery: boolean;
     getCredentials: TokenProvider;
 }
 
-export type TokenProvider = () => Promise<IToken>;
+export type TokenProvider = () => Promise<Token>;
 
 export type Formatter = (accessToken: string) => string;

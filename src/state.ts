@@ -1,9 +1,9 @@
-import { IState, IConfig, TokenProvider } from './types';
+import { State, Config, TokenProvider } from './types';
 import { initCache } from './utils/initialValues';
 
-let state: IState;
+let state: State;
 
-export const setInitialState = (options: IConfig, getCredentials: TokenProvider) => {
+export const setInitialState = (options: Config, getCredentials: TokenProvider) => {
     state = {
         cache: initCache,
         options,
@@ -14,7 +14,7 @@ export const setInitialState = (options: IConfig, getCredentials: TokenProvider)
     };
 };
 
-export const updateState = (update: Partial<IState>) => {
+export const updateState = (update: Partial<State>) => {
     state = { ...state, ...update };
 };
 

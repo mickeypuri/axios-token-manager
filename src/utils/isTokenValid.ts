@@ -1,6 +1,6 @@
-import { ICache } from '../types';
+import { Cache } from '../types';
 
-export const isTokenValid = (cache: ICache) => {
+export const isTokenValid = (cache: Cache) => {
     const { token, expiration } = cache;
     if (!token) {
         return false;

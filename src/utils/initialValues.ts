@@ -1,12 +1,12 @@
-import { ICache, IConfig } from '../types';
+import { Cache, Config } from '../types';
 import { noop } from './noop';
 
-export const initCache: ICache = {
+export const initCache: Cache = {
     token: null,
     expiration: 0
 };
 
-export const defaultSettings: IConfig = {
+export const defaultSettings: Config = {
     refreshBuffer: 10,
     header: 'Authorization',
     formatter: (access_token) => `Bearer ${access_token}`,
