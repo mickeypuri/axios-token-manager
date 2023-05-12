@@ -79,7 +79,7 @@ The axios-oauth-client library has been used here as an example for the implemen
 ```ts
 import axios from 'axios';
 import oauth from 'axios-oauth-client';
-import tokenManager, { TokenProvider, ITokenManager } from 'axios-token-manager';
+import tokenManager, { TokenProvider, Settings } from 'axios-token-manager';
 
 // Define an Axios instance using a common baseURL, timeout and the common headers for all requests
  ...
@@ -103,7 +103,7 @@ const getCredentials = oauth.clientCredentials(
 // define other optional settings for callbacks and other configurations (see API for config)
 ...
 
-const settings: ITokenManager = {
+const settings: Settings = {
     instance,
     getCredentials,
     ...                     // define other optional configuration 
@@ -119,7 +119,7 @@ export default instance;
 The above example only used the two required settings. Below is an example using all the settings.
 
 ```ts
-const settings: ITokenManager = {
+const settings: Settings = {
     instance,
     getCredentials,
     formatter,
