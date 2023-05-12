@@ -12,9 +12,9 @@ export interface ITokenManager extends DefaultSettings {
 
 export type LogFunction = (message?: string) => void;
 
-type DefaultSettings = Partial<IConfig>;
+type DefaultSettings = Partial<Config>;
 
-export interface IConfig {
+export interface Config {
     refreshBuffer: number;
     header: string;
     formatter: Formatter;
@@ -39,7 +39,7 @@ export interface IToken {
 
 export interface IState {
     cache: ICache;
-    options: IConfig;
+    options: Config;
     tokenTries: number;
     recoveryTries: number;
     inRecovery: boolean;
