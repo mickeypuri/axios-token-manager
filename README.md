@@ -1,6 +1,6 @@
 # axios-token-manager
 
-A library to manage caching of Axios Tokens with automatic refresh of Token on expiry or on error due to early revocation of the Token by the backend system.
+A library to manage caching of Axios Tokens with automatic refresh of Token on expiry or on error due to early revocation of the Token by the backend system. It can be used on a Node API Server as well as on a front end application.
 
 <div style="margin: 1.5em">
 
