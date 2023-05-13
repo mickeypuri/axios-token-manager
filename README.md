@@ -17,7 +17,7 @@ A library to manage caching of Axios Tokens with automatic refresh of Token on e
 - [Features](#features)
 - [Installing](#installing)
 - [Usage](#usage)
-- [Axios Token Manager API](#axios-token-manager-api)
+- [API](#api)
 
 ## Purpose
 
