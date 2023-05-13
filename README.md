@@ -17,7 +17,7 @@ A library to manage caching of Axios Tokens with automatic refresh of Token on e
 - [Features](#features)
 - [Installing](#installing)
 - [Usage](#usage)
-- [Axios Token Manager API](#axios-token-manager-api)
+- [API](#api)
 
 ## Purpose
 
@@ -137,7 +137,78 @@ tokenManager(settings);
 
 export default instance;
 ```
-## Axios Token Manager API
+
+## Token Shape
+The Token has the interface shown below. 
+
+```ts
+export interface Token {
+    access_token: string;
+    token_type?: string;
+    expires_in: number;
+    scope?: string;
+}
+```
+
+* `access_token` and `expires_in` are mandatory keys. 
+* `token_type` and `scope` are currently not used. 
+* `access_token` is sent across in the Authorization Header. 
+* `expires_in` field is expected to be in seconds and is used to work out how long to cache the token.
+
+## API
+
+### instance
+An Axios Instance. This instance should be used to make all requests that require an authentication header. The axios-token-manager will intercepts requests made by this instance and add an authentication header.
+
+### getCredentials
+A function called by the axios-token-manager whenever it needs to get a fresh Token. It needs to implement the `TokenProvider` type shown below. It is a mandatory setting.
+
+```ts
+export type TokenProvider = () => Promise<Token>;
+```
+
+### refreshBuffer
+The number of seconds at which the Token is refreshed before expiration of the currently cached token. Defaults to 10 seconds.
+
+### header
+The Header which is added to outgoing requests. Default is `Authorization`
+
+### formatter
+A function which takes in the `access_token` and returns the value to be assigned to the Header. It has the following type definition.
+```ts
+export type Formatter = (accessToken: string) => string;
+```
+
+### addTokenToLogs
+A boolean which controls whether the `access_token` value is returned in callbacks. When the `access_token` is returned it is part of a longer string giving the context. Default is `false`. 
+
+### onTokenRefresh
+Callback function when the Token is refreshed. If `addTokenToLogs` is true, a message containing the new Token's `access_token` is sent as an argument.
+
+### onAuthFail
+Callback function when the authentication fails and a status in the `refreshOnStatus` array is returned. If `addTokenToLogs` is true, a message containing the failed Token's `access_token` is sent as an argument.
+
+### onTokenRequestFail
+Callback function when a request for a new Token fails.
+
+### refreshOnStatus
+Array of Http Status codes on return of which the Token Manager will attempt to recover by fetching a new Token and retrying the request with the new Token. The default is `[401]`.
+
+### tokenTryThreshold
+If a request for a Token fails, then a new attempt is made to get a Token. Once the number of attempts reaches the `tokenTryThreshold` then a callback is invoked. The callback will be invoked again for every multiple of the `tokenTryThreshold`. The default is 10, therefore on every 10th failed attempt to get a fresh token the `onTokenTryThreshold` callback will be invoked.
+
+### onTokenTryThreshold
+Callback invoked when the number of failed attempts to get a new token reaches the `tokenTryThreshold` or any of its multiples. The callback is called with the number of failed tries an a parameter.
+
+### onRecoveryTry
+Callback invoked when an a attempt is made to resend the request using a fresh token after the earlier one failed with an authentication error defined in the `refreshOnStatus` setting. When `addTokenToLogs` is true, the callback will get invoked with a message giving the new `access_token` being used in the recovery attempt.
+
+### maxRecoveryTries
+The number of attempts to recover from a request which failed with an authentication error are counted. At each failure, a new token will be requested and a fresh attempt to recover made. The `maxRecoveryTries` sets the limit after which the system will no longer try and recover and it will send an error response back to the original caller. The default value is 5.
+
+### onRecoveryAbort
+Callback invoked when the number of attempts to recover from authentication failures reaches the `maxRecoveryTries`.
+
 
 
 
