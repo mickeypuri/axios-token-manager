@@ -32,9 +32,9 @@ export interface Config {
 
 export interface Token {
     access_token: string;
-    token_type: string;
+    token_type?: string;
     expires_in: number;
-    scope: string;
+    scope?: string;
 }
 
 export interface State {
