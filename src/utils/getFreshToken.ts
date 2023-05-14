@@ -1,5 +1,6 @@
 import { Token, TokenProvider } from '../types';
 import { getState, updateState } from '../state';
+import { preFetchToken } from './preFetchToken';
 
 export const getFreshToken = async (getCredentials :TokenProvider) : Promise<Token> => {
     const {options} = getState();
@@ -8,8 +9,9 @@ export const getFreshToken = async (getCredentials :TokenProvider) : Promise<Tok
         const token = await getCredentials();
         const { access_token, expires_in } = token;
         const { refreshBuffer, onTokenRefresh, addTokenToLogs } = options;
-        const timeSpan = (expires_in - refreshBuffer) * 1000;
-        const expiration = Date.now() + timeSpan;
+        const expiration = Date.now() + expires_in * 1000;
+        const refreshTime = expiration - refreshBuffer * 1000;
+        setTimeout(preFetchToken, refreshTime, access_token);
 
         updateState({ 
             cache: { token, expiration },
