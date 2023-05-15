@@ -15,7 +15,7 @@ const token: Token = {
     scope: 'site wide'
 };
 
-describe.only('shouldRecover from error', () => {
+describe('shouldRecover from error', () => {
     it('will return false if there is no response in the error', () => {
         (getState as jest.Mock).mockImplementationOnce(() => ({
             cache: { token, expiration: 0 },

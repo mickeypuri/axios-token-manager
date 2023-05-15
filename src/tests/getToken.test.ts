@@ -39,7 +39,7 @@ afterEach(() => {
     jest.clearAllMocks();
 })
 
-describe ('getToken', () => {
+describe('getToken', () => {
     it('will not get a fresh token if the previous request has already updated the token', async () => {
         const getCredentials: TokenProvider = jest.fn();
         const lock = {

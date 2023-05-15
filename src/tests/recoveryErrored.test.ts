@@ -2,6 +2,11 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import nock from 'nock';
 import { Token, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
+import { setPreFetchTimer } from '../utils/setPreFetchTimer';
+
+jest.mock('../utils/setPreFetchTimer', () => ({
+    setPreFetchTimer: jest.fn()
+}));
 
 const baseURL = 'https://api.news.com';
 const channelsPath = '/channel';
@@ -61,6 +66,7 @@ describe('tokenManager caching', () => {
         await instance.get(`${baseURL}${channelsPath}`);
 
         // call will fail with a 401, we intercept the 401 and try get another token but it errors and returns a 500 status
+        // as second attempt to get token fails, we will not call setPreFetchTimer again
         try {
             await instance.get(`${baseURL}${schedulePath}`); 
         } catch (error) {
@@ -71,5 +77,6 @@ describe('tokenManager caching', () => {
         expect((onRecoveryTry as jest.Mock)).toBeCalledTimes(0);
         expect((onTokenRefresh as jest.Mock)).toBeCalledTimes(1);
         expect((getCredentials as jest.Mock)).toBeCalledTimes(2);
+        expect((setPreFetchTimer as jest.Mock)).toBeCalledTimes(1);
     });
 });

@@ -2,6 +2,11 @@ import axios, { AxiosError } from 'axios';
 import nock from 'nock';
 import { Token, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
+import { setPreFetchTimer } from '../utils/setPreFetchTimer';
+
+jest.mock('../utils/setPreFetchTimer', () => ({
+    setPreFetchTimer: jest.fn()
+}));
 
 const baseURL = 'https://api.news.com';
 const channelsPath = '/channel';
@@ -87,5 +92,6 @@ describe('tokenManager caching', () => {
 
         expect((onTokenRefresh as jest.Mock)).toBeCalledTimes(1);
         expect((getCredentials as jest.Mock)).toBeCalledTimes(1);
+        expect((setPreFetchTimer as jest.Mock)).toBeCalledTimes(1);
     });
 });

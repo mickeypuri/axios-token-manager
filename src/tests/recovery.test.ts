@@ -3,6 +3,8 @@ import nock from 'nock';
 import { Token, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
 
+jest.mock('../utils/setPreFetchTimer');
+
 const baseURL = 'https://api.news.com';
 const channelsPath = '/channel';
 const schedulePath = '/schedule';
