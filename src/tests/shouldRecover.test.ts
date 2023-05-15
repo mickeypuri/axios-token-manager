@@ -1,10 +1,9 @@
 import { AxiosError } from 'axios';
 import { shouldRecover } from '../utils/shouldRecover';
-import { defaultSettings } from '../utils/initialValues';
+import { initCache, defaultSettings } from '../utils/initialValues';
 import { Token, LogFunction } from '../types';
 
 import { getState, updateState } from '../state';
-import { initCache } from '../utils/initialValues';
 
 jest.mock('../state');
 
