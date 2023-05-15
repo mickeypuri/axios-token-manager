@@ -37,14 +37,14 @@ const errorInterceptor = async (error: AxiosError) => {
     if (needsToRecover) {
         let token : Token;
         await lock.acquire();
-        const { cache, getCredentials } = getState();
+        const { cache } = getState();
 
         if (isTokenValid(cache)) {
             token = cache.token as Token;
             lock.release();
         } else {
             try {
-                token = await getFreshToken(getCredentials);
+                token = await getFreshToken();
             }
             catch (error) {
                 return Promise.reject(error);

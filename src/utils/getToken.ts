@@ -5,7 +5,7 @@ import { isTokenValid } from './isTokenValid';
 import { getFreshToken } from './getFreshToken';
 
 export const getToken  = async (lock : Semaphore) => {
-    const { cache, getCredentials } = getState();
+    const { cache } = getState();
     if (isTokenValid(cache)) {
         const { token } = cache;
         return Promise.resolve(token as Token);
@@ -22,7 +22,7 @@ export const getToken  = async (lock : Semaphore) => {
     }
 
     try {
-        const credentials = await getFreshToken(getCredentials);
+        const credentials = await getFreshToken();
         return Promise.resolve(credentials);
     } 
     catch (error) {

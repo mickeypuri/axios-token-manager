@@ -2,11 +2,16 @@ import axios from 'axios';
 import nock from 'nock';
 import { Token, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
+import { setPreFetchTimer } from '../utils/setPreFetchTimer';
 
 // This mocks the shouldRecover function, and forces it to recover when there is an error
 // As shouldRecover is mocked, it skips resetting the cache in this test. 
 // So the cache and token remains valid, which simulates the situation that a previous request has got a new token 
 // and has cached it and hence the cache and token are valid
+
+jest.mock('../utils/setPreFetchTimer', () => ({
+    setPreFetchTimer: jest.fn()
+}));
 
 jest.mock('../utils/shouldRecover', () => ({
     shouldRecover: () => true
@@ -90,6 +95,7 @@ describe('tokenManager caching', () => {
         await instance.get(`${baseURL}${schedulePath}`);
         await instance.get(`${baseURL}${schedulePath}`);
 
+        expect((setPreFetchTimer as jest.Mock)).toBeCalledTimes(1); // the timer is set to do a prefetch
         expect((onRecoveryTry as jest.Mock)).toBeCalledTimes(1);    // tries to recover the failed call
         expect((onTokenRefresh as jest.Mock)).toBeCalledTimes(1);   // does not call for a further token refresh as Token was still valid
         expect((getCredentials as jest.Mock)).toBeCalledTimes(1);   // does not call for a token again as the Token was still valid

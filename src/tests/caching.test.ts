@@ -4,6 +4,11 @@ import { Token, TokenProvider, LogFunction } from '../types';
 import tokenManager from '../tokenManager';
 import { getState } from '../state';
 import { defaultSettings } from '../utils/initialValues';
+import { setPreFetchTimer } from '../utils/setPreFetchTimer';
+
+jest.mock('../utils/setPreFetchTimer', () => ({
+    setPreFetchTimer: jest.fn()
+}));
 
 const baseURL = 'https://api.news.com';
 const channelsPath = '/channel';
@@ -33,9 +38,9 @@ beforeAll(() => {
         .persist();
 });
 
-beforeEach(() => {
-    jest.resetAllMocks;
-});
+afterEach(() => {
+    jest.clearAllMocks();
+})
 
 afterAll(() => {
     nock.cleanAll();
@@ -51,6 +56,7 @@ describe('tokenManager caching', () => {
         tokenManager({ instance, getCredentials });
         await instance.get(`${baseURL}${channelsPath}`);
         expect((getCredentials as jest.Mock)).toBeCalledTimes(1);
+        expect((setPreFetchTimer as jest.Mock)).toBeCalledTimes(1);
     });
 
     it('caches the Token after getting it', async () => {
@@ -74,7 +80,7 @@ describe('tokenManager caching', () => {
         tokenManager({ instance, getCredentials });
         await instance.get(`${baseURL}${channelsPath}`);
 
-        const expectedExpiry = Date.now() + (EXPIRES_IN_SECS - refreshBuffer) * 1000;
+        const expectedExpiry = Date.now() + (EXPIRES_IN_SECS) * 1000;
         const { cache : { expiration }} = getState();
 
         const expectedExpirySecs = Math.round(expectedExpiry/1000);
@@ -166,5 +172,6 @@ describe('tokenManager caching', () => {
         await instance.get(`${baseURL}${channelsPath}`);     
 
         expect((getCredentials as jest.Mock)).toBeCalledTimes(3);
+        expect((setPreFetchTimer as jest.Mock)).toBeCalledTimes(3);
     });
 });
