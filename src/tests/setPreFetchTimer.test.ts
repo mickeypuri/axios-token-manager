@@ -18,6 +18,7 @@ afterAll(() => {
 
 const EXPIRES_IN_SECS = 3600;
 const ACCESS_TOKEN = 'Token One';
+const EXPIRATION = Date.now() + EXPIRES_IN_SECS * 1000;
 
 const token: Token = {
     access_token: ACCESS_TOKEN,
@@ -29,7 +30,7 @@ const token: Token = {
 describe('setPreFetchTimer', () => {
     it('calls setTimeout with the correct refresh period and access_token', () => {
         (getState as jest.Mock).mockImplementationOnce(() => ({
-            cache: { token, expiration: EXPIRES_IN_SECS },
+            cache: { token, expiration: EXPIRATION },
             options: defaultSettings,
             tokenTries: 0,
             recoveryTries: 0,
@@ -48,7 +49,7 @@ describe('setPreFetchTimer', () => {
 
     it('preFetchToken is invoked after the refresh period', () => {
         (getState as jest.Mock).mockImplementationOnce(() => ({
-            cache: { token, expiration: EXPIRES_IN_SECS },
+            cache: { token, expiration: EXPIRATION },
             options: defaultSettings,
             tokenTries: 0,
             recoveryTries: 0,
