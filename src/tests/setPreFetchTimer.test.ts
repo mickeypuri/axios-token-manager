@@ -27,7 +27,7 @@ const token: Token = {
 };
 
 describe('setPreFetchTimer', () => {
-    it('will call setTimeout with the correct refresh time and access_token value', () => {
+    it('calls setTimeout with the correct refresh period and access_token', () => {
         (getState as jest.Mock).mockImplementationOnce(() => ({
             cache: { token, expiration: EXPIRES_IN_SECS },
             options: defaultSettings,
@@ -44,5 +44,25 @@ describe('setPreFetchTimer', () => {
 
         expect(setTimeout).toBeCalled();
         expect(setTimeout).toHaveBeenLastCalledWith(preFetchToken, refreshPeriod, ACCESS_TOKEN);
+    });
+
+    it('preFetchToken is invoked after the refresh period', () => {
+        (getState as jest.Mock).mockImplementationOnce(() => ({
+            cache: { token, expiration: EXPIRES_IN_SECS },
+            options: defaultSettings,
+            tokenTries: 0,
+            recoveryTries: 0,
+            inRecovery: false,
+            getCredentials: jest.fn()
+        }));
+        
+        const { refreshBuffer } = defaultSettings;
+        const refreshPeriod = (EXPIRES_IN_SECS - refreshBuffer) * 1000;
+
+        setPreFetchTimer(token);
+       
+        // Fast Forward till all timers have been called
+        jest.runAllTimers();
+        expect(preFetchToken).toBeCalled();
     });
 });
