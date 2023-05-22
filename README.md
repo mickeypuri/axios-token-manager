@@ -122,8 +122,12 @@ The above example only used the two required settings. Below is an example using
 const settings: Settings = {
     instance,
     getCredentials,
+    refreshBuffer,
+    header,
     formatter,
     refreshOnStatus,
+    tokenTryThreshold,
+    maxRecoveryTries,
     addTokenToLogs,
     onTokenRefresh,
     onAuthFail,
@@ -179,6 +183,15 @@ A function which takes in the `access_token` and returns the value to be assigne
 export type Formatter = (accessToken: string) => string;
 ```
 
+### refreshOnStatus
+Array of Http Status codes on return of which the Token Manager will attempt to recover by fetching a new Token and retrying the request with the new Token. The default is `[401]`.
+
+### tokenTryThreshold
+If a request for a Token fails, then a new attempt is made to get a Token. Once the number of attempts reaches the `tokenTryThreshold` then a callback is invoked. The callback will be invoked again for every multiple of the `tokenTryThreshold`. The default is 10, therefore on every 10th failed attempt to get a fresh token the `onTokenTryThreshold` callback will be invoked.
+
+### maxRecoveryTries
+The number of attempts to recover from a request which failed with an authentication error are counted. At each failure, a new token will be requested and a fresh attempt to recover made. The `maxRecoveryTries` sets the limit after which the system will no longer try and recover and it will send an error response back to the original caller. The default value is 5.
+
 ### addTokenToLogs
 A boolean which controls whether the `access_token` value is returned in callbacks. When the `access_token` is returned it is part of a longer string giving the context. Default is `false`. 
 
@@ -191,20 +204,11 @@ Callback function when the authentication fails and a status in the `refreshOnSt
 ### onTokenRequestFail
 Callback function when a request for a new Token fails.
 
-### refreshOnStatus
-Array of Http Status codes on return of which the Token Manager will attempt to recover by fetching a new Token and retrying the request with the new Token. The default is `[401]`.
-
-### tokenTryThreshold
-If a request for a Token fails, then a new attempt is made to get a Token. Once the number of attempts reaches the `tokenTryThreshold` then a callback is invoked. The callback will be invoked again for every multiple of the `tokenTryThreshold`. The default is 10, therefore on every 10th failed attempt to get a fresh token the `onTokenTryThreshold` callback will be invoked.
-
-### onTokenTryThreshold
-Callback invoked when the number of failed attempts to get a new token reaches the `tokenTryThreshold` or any of its multiples. The callback is called with the number of failed tries an a parameter.
-
 ### onRecoveryTry
 Callback invoked when an a attempt is made to resend the request using a fresh token after the earlier one failed with an authentication error defined in the `refreshOnStatus` setting. When `addTokenToLogs` is true, the callback will get invoked with a message giving the new `access_token` being used in the recovery attempt.
 
-### maxRecoveryTries
-The number of attempts to recover from a request which failed with an authentication error are counted. At each failure, a new token will be requested and a fresh attempt to recover made. The `maxRecoveryTries` sets the limit after which the system will no longer try and recover and it will send an error response back to the original caller. The default value is 5.
+### onTokenTryThreshold
+Callback invoked when the number of failed attempts to get a new token reaches the `tokenTryThreshold` or any of its multiples. The callback is called with the number of failed tries an a parameter.
 
 ### onRecoveryAbort
 Callback invoked when the number of attempts to recover from authentication failures reaches the `maxRecoveryTries`.
